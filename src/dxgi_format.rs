@@ -136,58 +136,72 @@ impl Default for DXGI_FORMAT {
 }
 
 impl DXGI_FORMAT {
-    pub fn is_valid(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsValid(self) }
+    #[must_use]
+    pub fn is_valid(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsValid(*self) }
     }
 
-    pub fn is_compressed(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsCompressed(self) }
+    #[must_use]
+    pub fn is_compressed(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsCompressed(*self) }
     }
 
-    pub fn is_packed(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsPacked(self) }
+    #[must_use]
+    pub fn is_packed(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsPacked(*self) }
     }
 
-    pub fn is_video(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsVideo(self) }
+    #[must_use]
+    pub fn is_video(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsVideo(*self) }
     }
 
-    pub fn is_planar(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsPlanar(self) }
+    #[must_use]
+    pub fn is_planar(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsPlanar(*self) }
     }
 
-    pub fn is_palettized(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsPalettized(self) }
+    #[must_use]
+    pub fn is_palettized(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsPalettized(*self) }
     }
 
-    pub fn is_depth_stencil(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsDepthStencil(self) }
+    #[must_use]
+    pub fn is_depth_stencil(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsDepthStencil(*self) }
     }
 
-    pub fn is_srgb(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsSRGB(self) }
+    #[must_use]
+    pub fn is_srgb(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsSRGB(*self) }
     }
 
-    pub fn is_bgr(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsBGR(self) }
+    #[must_use]
+    pub fn is_bgr(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsBGR(*self) }
     }
 
+    #[must_use]
     pub fn is_typeless(self, partial_typeless: bool) -> bool {
         unsafe { ffi::DirectXTexFFI_IsTypeless(self, partial_typeless) }
     }
 
+    #[must_use]
     pub fn has_alpha(&self) -> bool {
         unsafe { ffi::DirectXTexFFI_HasAlpha(*self) }
     }
 
+    #[must_use]
     pub fn bits_per_pixel(&self) -> usize {
         unsafe { ffi::DirectXTexFFI_BitsPerPixel(*self) }
     }
 
+    #[must_use]
     pub fn bits_per_color(&self) -> usize {
         unsafe { ffi::DirectXTexFFI_BitsPerColor(*self) }
     }
 
+    #[must_use]
     pub fn format_data_type(&self) -> FORMAT_TYPE {
         unsafe { ffi::DirectXTexFFI_FormatDataType(*self) }
     }

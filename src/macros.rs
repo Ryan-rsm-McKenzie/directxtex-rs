@@ -25,6 +25,7 @@ macro_rules! c_enum {
 		impl $enumeration {
 			$(pub const $variant: Self = Self($value);)*
 
+			#[must_use]
 			pub fn from_unchecked(value: $underlying) -> Self {
 				Self(value)
 			}
