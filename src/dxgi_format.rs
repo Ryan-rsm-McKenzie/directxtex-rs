@@ -1,68 +1,8 @@
-use crate::ffi;
-use std::{
-    error,
-    fmt::{self, Debug, Display, Formatter},
-};
+use crate::{ffi, macros, FORMAT_TYPE};
+use std::ffi::c_uint;
 
-#[derive(Debug)]
-pub struct InvalidRepresentation<T>(T);
-
-impl<T> Display for InvalidRepresentation<T>
-where
-    T: Display,
-{
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{} is not a valid variant of the enumeration", self.0)
-    }
-}
-
-impl<T> error::Error for InvalidRepresentation<T> where T: Debug + Display {}
-
-macro_rules! c_enum {
-	($enumeration:ident($underlying:ty) => { $($variant:ident = $value:literal,)* }) => {
-		#[allow(non_camel_case_types)]
-		#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
-		#[repr(transparent)]
-		pub struct $enumeration($underlying);
-
-		impl $enumeration {
-			$(pub const $variant: Self = Self($value);)*
-
-			pub fn from_unchecked(value: $underlying) -> Self {
-				Self(value)
-			}
-		}
-
-		impl From<$enumeration> for $underlying {
-			fn from(value: $enumeration) -> Self {
-				value.0
-			}
-		}
-
-		impl TryFrom<$underlying> for $enumeration {
-			type Error = InvalidRepresentation<$underlying>;
-
-			fn try_from(value: $underlying) -> Result<Self, Self::Error> {
-				match value {
-					$($value => Ok(Self::$variant),)*
-					_ => Err(InvalidRepresentation(value))
-				}
-			}
-		}
-
-		impl Display for $enumeration {
-			fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-				match self.0 {
-					$($value => write!(f, "{}", std::stringify!($variant)),)*
-					unk => write!(f, "{unk:x}"),
-				}
-			}
-		}
-	};
-}
-
-c_enum! {
-    DXGI_FORMAT(u32) => {
+macros::c_enum! {
+    DXGI_FORMAT(c_uint) => {
         DXGI_FORMAT_UNKNOWN = 0,
         DXGI_FORMAT_R32G32B32A32_TYPELESS = 1,
         DXGI_FORMAT_R32G32B32A32_FLOAT = 2,
@@ -235,11 +175,27 @@ impl DXGI_FORMAT {
     pub fn is_typeless(self, partial_typeless: bool) -> bool {
         unsafe { ffi::DirectXTexFFI_IsTypeless(self, partial_typeless) }
     }
+
+    pub fn has_alpha(&self) -> bool {
+        unsafe { ffi::DirectXTexFFI_HasAlpha(*self) }
+    }
+
+    pub fn bits_per_pixel(&self) -> usize {
+        unsafe { ffi::DirectXTexFFI_BitsPerPixel(*self) }
+    }
+
+    pub fn bits_per_color(&self) -> usize {
+        unsafe { ffi::DirectXTexFFI_BitsPerColor(*self) }
+    }
+
+    pub fn format_data_type(&self) -> FORMAT_TYPE {
+        unsafe { ffi::DirectXTexFFI_FormatDataType(*self) }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::DXGI_FORMAT;
+    use crate::{DXGI_FORMAT, FORMAT_TYPE};
 
     #[test]
     fn is_valid() {
@@ -333,5 +289,98 @@ mod tests {
         );
         assert_eq!(DXGI_FORMAT::DXGI_FORMAT_NV11.is_typeless(false), false);
         assert_eq!(DXGI_FORMAT::DXGI_FORMAT_NV11.is_typeless(true), false);
+    }
+
+    #[test]
+    fn has_alpha() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_TYPELESS.has_alpha(),
+            true
+        );
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT.has_alpha(), false);
+    }
+
+    #[test]
+    fn bits_per_pixel() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_TYPELESS.bits_per_pixel(),
+            128
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32_TYPELESS.bits_per_pixel(),
+            96
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_TYPELESS.bits_per_pixel(),
+            64
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R10G10B10A2_TYPELESS.bits_per_pixel(),
+            32
+        );
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_P010.bits_per_pixel(), 24);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_R8G8_TYPELESS.bits_per_pixel(), 16);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_NV12.bits_per_pixel(), 12);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_R8_TYPELESS.bits_per_pixel(), 8);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_R1_UNORM.bits_per_pixel(), 1);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_BC1_TYPELESS.bits_per_pixel(), 4);
+    }
+
+    #[test]
+    fn bits_per_color() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_TYPELESS.bits_per_color(),
+            32
+        );
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_R24G8_TYPELESS.bits_per_color(), 24);
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_TYPELESS.bits_per_color(),
+            16
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R9G9B9E5_SHAREDEXP.bits_per_color(),
+            14
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R11G11B10_FLOAT.bits_per_color(),
+            11
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R10G10B10A2_TYPELESS.bits_per_color(),
+            10
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_TYPELESS.bits_per_color(),
+            8
+        );
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_BC7_TYPELESS.bits_per_color(), 7);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_BC1_TYPELESS.bits_per_color(), 6);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_B5G5R5A1_UNORM.bits_per_color(), 5);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_B4G4R4A4_UNORM.bits_per_color(), 4);
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_R1_UNORM.bits_per_color(), 1);
+    }
+
+    #[test]
+    fn format_data_type() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT.format_data_type(),
+            FORMAT_TYPE::FORMAT_TYPE_FLOAT
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_UNORM.format_data_type(),
+            FORMAT_TYPE::FORMAT_TYPE_UNORM
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_UINT.format_data_type(),
+            FORMAT_TYPE::FORMAT_TYPE_UINT
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_SNORM.format_data_type(),
+            FORMAT_TYPE::FORMAT_TYPE_SNORM
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_SINT.format_data_type(),
+            FORMAT_TYPE::FORMAT_TYPE_SINT
+        );
     }
 }
