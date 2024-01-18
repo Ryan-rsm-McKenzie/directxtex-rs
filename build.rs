@@ -70,14 +70,16 @@ fn build_tex() {
         ]);
 
     if cfg!(windows) {
-        build.files(
-            [
-                "DirectXTex/DirectXTexFlipRotate.cpp",
-                "DirectXTex/DirectXTexWIC.cpp",
-            ]
-            .into_iter()
-            .map(|x| root.join(x)),
-        );
+        build
+            .files(
+                [
+                    "DirectXTex/DirectXTexFlipRotate.cpp",
+                    "DirectXTex/DirectXTexWIC.cpp",
+                ]
+                .into_iter()
+                .map(|x| root.join(x)),
+            )
+            .object("Ole32.lib");
     } else {
         build.include("external/DirectX-Headers/include/wsl/stubs");
     }
@@ -85,7 +87,20 @@ fn build_tex() {
     build.compile("DirectXTex");
 }
 
+fn build_ffi() {
+    let root = Path::new("ffi");
+    let mut build = Build::new();
+    build
+        .cpp(true)
+        .std("c++17")
+        .file(root.join("main.cpp"))
+        .include(root)
+        .include("external/DirectXTex/DirectXTex");
+    build.compile("directxtex-ffi");
+}
+
 fn main() {
     build_headers();
     build_tex();
+    build_ffi();
 }

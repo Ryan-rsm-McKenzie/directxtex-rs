@@ -1,14 +1,6 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+#![warn(clippy::pedantic)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod dxgi_format;
+mod ffi;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use dxgi_format::DXGI_FORMAT;
