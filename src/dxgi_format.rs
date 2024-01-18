@@ -1,8 +1,16 @@
-use crate::{ffi, macros, FORMAT_TYPE};
-use std::ffi::c_uint;
+use crate::{ffi, hresult, macros, CP_FLAGS, FORMAT_TYPE};
+use core::ffi::c_int;
+
+type Result<T> = core::result::Result<T, hresult::Error>;
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct Pitch {
+    pub row: usize,
+    pub slice: usize,
+}
 
 macros::c_enum! {
-    DXGI_FORMAT(c_uint) => {
+    DXGI_FORMAT(c_int) => {
         DXGI_FORMAT_UNKNOWN = 0,
         DXGI_FORMAT_R32G32B32A32_TYPELESS = 1,
         DXGI_FORMAT_R32G32B32A32_FLOAT = 2,
@@ -129,6 +137,23 @@ macros::c_enum! {
     }
 }
 
+impl DXGI_FORMAT {
+    pub const XBOX_DXGI_FORMAT_R10G10B10_7E3_A2_FLOAT: Self = Self(116);
+    pub const XBOX_DXGI_FORMAT_R10G10B10_6E4_A2_FLOAT: Self = Self(117);
+    pub const XBOX_DXGI_FORMAT_D16_UNORM_S8_UINT: Self = Self(118);
+    pub const XBOX_DXGI_FORMAT_R16_UNORM_X8_TYPELESS: Self = Self(119);
+    pub const XBOX_DXGI_FORMAT_X16_TYPELESS_G8_UINT: Self = Self(120);
+
+    pub const WIN10_DXGI_FORMAT_P208: Self = Self(130);
+    pub const WIN10_DXGI_FORMAT_V208: Self = Self(131);
+    pub const WIN10_DXGI_FORMAT_V408: Self = Self(132);
+
+    pub const XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM: Self = Self(189);
+    pub const XBOX_DXGI_FORMAT_R4G4_UNORM: Self = Self(190);
+
+    pub const WIN11_DXGI_FORMAT_A4B4G4R4_UNORM: Self = Self(191);
+}
+
 impl Default for DXGI_FORMAT {
     fn default() -> Self {
         Self::DXGI_FORMAT_UNKNOWN
@@ -205,11 +230,57 @@ impl DXGI_FORMAT {
     pub fn format_data_type(&self) -> FORMAT_TYPE {
         unsafe { ffi::DirectXTexFFI_FormatDataType(*self) }
     }
+
+    pub fn compute_pitch(&self, width: usize, height: usize, flags: CP_FLAGS) -> Result<Pitch> {
+        let mut pitch = Pitch::default();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_ComputePitch(
+                *self,
+                width,
+                height,
+                (&mut pitch.row).into(),
+                (&mut pitch.slice).into(),
+                flags,
+            )
+        };
+
+        hr.ok().map(|()| pitch)
+    }
+
+    #[must_use]
+    pub fn compute_scanlines(&self, height: usize) -> usize {
+        unsafe { ffi::DirectXTexFFI_ComputeScanlines(*self, height) }
+    }
+
+    #[must_use]
+    pub fn make_srgb(&self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeSRGB(*self) }
+    }
+
+    #[must_use]
+    pub fn make_linear(&self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeLinear(*self) }
+    }
+
+    #[must_use]
+    pub fn make_typeless(&self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeTypeless(*self) }
+    }
+
+    #[must_use]
+    pub fn make_typeless_unorm(&self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeTypelessUNORM(*self) }
+    }
+
+    #[must_use]
+    pub fn make_typeless_float(&self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeTypelessFLOAT(*self) }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{DXGI_FORMAT, FORMAT_TYPE};
+    use crate::{CP_FLAGS, DXGI_FORMAT, FORMAT_TYPE};
 
     #[test]
     fn is_valid() {
@@ -395,6 +466,105 @@ mod tests {
         assert_eq!(
             DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_SINT.format_data_type(),
             FORMAT_TYPE::FORMAT_TYPE_SINT
+        );
+    }
+
+    #[test]
+    fn compute_pitch() {
+        let pitch = DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM
+            .compute_pitch(0x400, 0x400, CP_FLAGS::CP_FLAGS_NONE)
+            .unwrap();
+        assert_eq!(pitch.row, 0x1000);
+        assert_eq!(pitch.slice, 0x100000);
+    }
+
+    #[test]
+    fn compute_scanlines() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_BC1_TYPELESS.compute_scanlines(64),
+            16
+        );
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_NV11.compute_scanlines(64), 128);
+        assert_eq!(
+            DXGI_FORMAT::WIN10_DXGI_FORMAT_V208.compute_scanlines(64),
+            128
+        );
+        assert_eq!(
+            DXGI_FORMAT::WIN10_DXGI_FORMAT_V408.compute_scanlines(64),
+            192
+        );
+        assert_eq!(DXGI_FORMAT::DXGI_FORMAT_NV12.compute_scanlines(64), 96);
+    }
+
+    #[test]
+    fn make_srgb() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM.make_srgb(),
+            DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM.make_srgb(),
+            DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM_SRGB
+        );
+    }
+
+    #[test]
+    fn make_linear() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_BC1_UNORM_SRGB.make_linear(),
+            DXGI_FORMAT::DXGI_FORMAT_BC1_UNORM
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_BC2_UNORM_SRGB.make_linear(),
+            DXGI_FORMAT::DXGI_FORMAT_BC2_UNORM
+        );
+    }
+
+    #[test]
+    fn make_typeless() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT.make_typeless(),
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_TYPELESS
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16_FLOAT.make_typeless(),
+            DXGI_FORMAT::DXGI_FORMAT_R16G16_TYPELESS
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R8G8_UNORM.make_typeless(),
+            DXGI_FORMAT::DXGI_FORMAT_R8G8_TYPELESS
+        );
+    }
+
+    #[test]
+    fn make_typeless_unorm() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_TYPELESS.make_typeless_unorm(),
+            DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_UNORM
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R8_TYPELESS.make_typeless_unorm(),
+            DXGI_FORMAT::DXGI_FORMAT_R8_UNORM
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_BC5_TYPELESS.make_typeless_unorm(),
+            DXGI_FORMAT::DXGI_FORMAT_BC5_UNORM
+        );
+    }
+
+    #[test]
+    fn make_typeless_float() {
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_TYPELESS.make_typeless_float(),
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32_TYPELESS.make_typeless_float(),
+            DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT
+        );
+        assert_eq!(
+            DXGI_FORMAT::DXGI_FORMAT_R32_TYPELESS.make_typeless_float(),
+            DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT
         );
     }
 }

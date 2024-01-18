@@ -1,4 +1,5 @@
-use crate::{DXGI_FORMAT, FORMAT_TYPE};
+use crate::{CP_FLAGS, DXGI_FORMAT, FORMAT_TYPE, HRESULT};
+use core::ptr::NonNull;
 
 #[allow(non_snake_case)]
 #[link(name = "directxtex-ffi")]
@@ -21,4 +22,21 @@ extern "C" {
     pub(crate) fn DirectXTexFFI_BitsPerColor(fmt: DXGI_FORMAT) -> usize;
 
     pub(crate) fn DirectXTexFFI_FormatDataType(fmt: DXGI_FORMAT) -> FORMAT_TYPE;
+
+    pub(crate) fn DirectXTexFFI_ComputePitch(
+        fmt: DXGI_FORMAT,
+        width: usize,
+        height: usize,
+        rowPitch: NonNull<usize>,
+        slicePitch: NonNull<usize>,
+        flags: CP_FLAGS,
+    ) -> HRESULT;
+
+    pub(crate) fn DirectXTexFFI_ComputeScanlines(fmt: DXGI_FORMAT, height: usize) -> usize;
+
+    pub(crate) fn DirectXTexFFI_MakeSRGB(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeLinear(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeTypeless(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeTypelessUNORM(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeTypelessFLOAT(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
 }

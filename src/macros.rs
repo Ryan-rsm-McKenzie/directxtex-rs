@@ -40,7 +40,7 @@ macro_rules! c_enum {
 		impl TryFrom<$underlying> for $enumeration {
 			type Error = crate::InvalidEnumRepresentation<$underlying>;
 
-			fn try_from(value: $underlying) -> Result<Self, Self::Error> {
+			fn try_from(value: $underlying) -> core::result::Result<Self, Self::Error> {
 				match value {
 					$($value => Ok(Self::$variant),)*
 					_ => Err(crate::InvalidEnumRepresentation(value))

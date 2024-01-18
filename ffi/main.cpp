@@ -1,10 +1,18 @@
 #include <cassert>
+#include <cstdint>
 #include <functional>
 #include <new>
+#include <type_traits>
 
 #include "DirectXTex.h"
 
 #define FFI(function) DirectXTexFFI_##function
+
+static_assert(std::is_same_v<std::underlying_type_t<DirectX::CP_FLAGS>, unsigned long>);
+static_assert(std::is_same_v<std::underlying_type_t<DirectX::FORMAT_TYPE>, int>);
+static_assert(std::is_same_v<std::underlying_type_t<DXGI_FORMAT>, int>);
+
+static_assert(sizeof(HRESULT) == 4);
 
 extern "C"
 {

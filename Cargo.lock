@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "bitflags"
+version = "2.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed570934406eb16438a4e976b1b4500774099c13b8cb96eec99f620f05090ddf"
+
+[[package]]
 name = "cc"
 version = "1.0.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -15,6 +21,7 @@ dependencies = [
 name = "directxtex"
 version = "0.1.0"
 dependencies = [
+ "bitflags",
  "cc",
 ]
 

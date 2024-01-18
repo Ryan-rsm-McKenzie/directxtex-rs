@@ -4,6 +4,7 @@ name = "directxtex"
 version = "0.1.0"
 
 [dependencies]
+bitflags = "2.4.2"
 
 [build-dependencies]
 cc = "1.0.83"
