@@ -1,10 +1,21 @@
 use crate::{
-    DDSMetaData, HResult, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT, FORMAT_TYPE, TGA_FLAGS,
+    DDSMetaData, HResult, Image, ScratchImageFFI, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
+    FORMAT_TYPE, TGA_FLAGS,
 };
 use core::ptr::NonNull;
 
 #[repr(transparent)]
-pub struct ConstPtr<T>(NonNull<T>);
+pub(crate) struct ConstPtr<T>(NonNull<T>);
+
+impl<T> ConstPtr<T> {
+    pub(crate) unsafe fn as_ref<'a>(&self) -> &'a T {
+        self.0.as_ref()
+    }
+
+    pub(crate) fn new(value: NonNull<T>) -> Self {
+        Self(value)
+    }
+}
 
 impl<T> From<&T> for ConstPtr<T> {
     fn from(value: &T) -> Self {
@@ -13,7 +24,13 @@ impl<T> From<&T> for ConstPtr<T> {
 }
 
 #[repr(transparent)]
-pub struct MutPtr<T>(NonNull<T>);
+pub(crate) struct MutPtr<T>(NonNull<T>);
+
+impl<T> MutPtr<T> {
+    pub(crate) fn new(value: NonNull<T>) -> Self {
+        Self(value)
+    }
+}
 
 impl<T> From<&mut T> for MutPtr<T> {
     fn from(value: &mut T) -> Self {
@@ -93,4 +110,111 @@ extern "C" {
         flags: TGA_FLAGS,
         metadata: MutPtr<TexMetadata>,
     ) -> HResult;
+
+    //---------------------------------------------------------------------------------
+    // Bitmap image container
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_Ctor() -> *mut ScratchImageFFI;
+    pub(crate) fn DirectXTexFFI_ScratchImage_Dtor(this: MutPtr<ScratchImageFFI>);
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize(
+        this: MutPtr<ScratchImageFFI>,
+        mdata: ConstPtr<TexMetadata>,
+        flags: CP_FLAGS,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize1D(
+        this: MutPtr<ScratchImageFFI>,
+        fmt: DXGI_FORMAT,
+        length: usize,
+        arraySize: usize,
+        mipLevels: usize,
+        flags: CP_FLAGS,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize2D(
+        this: MutPtr<ScratchImageFFI>,
+        fmt: DXGI_FORMAT,
+        width: usize,
+        height: usize,
+        arraySize: usize,
+        mipLevels: usize,
+        flags: CP_FLAGS,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize3D(
+        this: MutPtr<ScratchImageFFI>,
+        fmt: DXGI_FORMAT,
+        width: usize,
+        height: usize,
+        depth: usize,
+        mipLevels: usize,
+        flags: CP_FLAGS,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeCube(
+        this: MutPtr<ScratchImageFFI>,
+        fmt: DXGI_FORMAT,
+        width: usize,
+        height: usize,
+        nCubes: usize,
+        mipLevels: usize,
+        flags: CP_FLAGS,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeFromImage(
+        this: MutPtr<ScratchImageFFI>,
+        srcImage: ConstPtr<Image>,
+        allow1D: bool,
+        flags: CP_FLAGS,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeArrayFromImages(
+        this: MutPtr<ScratchImageFFI>,
+        images: *const Image,
+        nImages: usize,
+        allow1D: bool,
+        flags: CP_FLAGS,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeCubeFromImages(
+        this: MutPtr<ScratchImageFFI>,
+        images: *const Image,
+        nImages: usize,
+        flags: CP_FLAGS,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize3DFromImages(
+        this: MutPtr<ScratchImageFFI>,
+        images: *const Image,
+        depth: usize,
+        flags: CP_FLAGS,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_Release(this: MutPtr<ScratchImageFFI>);
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_OverrideFormat(
+        this: MutPtr<ScratchImageFFI>,
+        f: DXGI_FORMAT,
+    ) -> bool;
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_GetMetadata(
+        this: ConstPtr<ScratchImageFFI>,
+    ) -> ConstPtr<TexMetadata>;
+    pub(crate) fn DirectXTexFFI_ScratchImage_GetImage(
+        this: ConstPtr<ScratchImageFFI>,
+        mip: usize,
+        item: usize,
+        slice: usize,
+    ) -> *const Image;
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_GetImages(
+        this: ConstPtr<ScratchImageFFI>,
+    ) -> *const Image;
+    pub(crate) fn DirectXTexFFI_ScratchImage_GetImageCount(
+        this: ConstPtr<ScratchImageFFI>,
+    ) -> usize;
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_GetPixels(this: ConstPtr<ScratchImageFFI>) -> *mut u8;
+    pub(crate) fn DirectXTexFFI_ScratchImage_GetPixelsSize(
+        this: ConstPtr<ScratchImageFFI>,
+    ) -> usize;
+
+    pub(crate) fn DirectXTexFFI_ScratchImage_IsAlphaAllOpaque(
+        this: ConstPtr<ScratchImageFFI>,
+    ) -> bool;
 }

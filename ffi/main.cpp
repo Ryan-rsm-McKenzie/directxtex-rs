@@ -242,10 +242,9 @@ extern "C"
 
 	// class ScratchImage {
 
-	void FFI(ScratchImage_Ctor)(DirectX::ScratchImage** self) noexcept
+	DirectX::ScratchImage* FFI(ScratchImage_Ctor)() noexcept
 	{
-		assert(self != nullptr);
-		new (*self) DirectX::ScratchImage;
+		return new (std::nothrow) DirectX::ScratchImage;
 	}
 
 	void FFI(ScratchImage_Dtor)(DirectX::ScratchImage* self) noexcept
@@ -256,7 +255,7 @@ extern "C"
 
 	HRESULT FFI(ScratchImage_Initialize)(
 		DirectX::ScratchImage* self,
-		DirectX::TexMetadata* mdata,
+		const DirectX::TexMetadata* mdata,
 		DirectX::CP_FLAGS flags) noexcept
 	{
 		assert(self != nullptr);
@@ -431,11 +430,9 @@ extern "C"
 
 	// class Blob {
 
-	void FFI(Blob_Ctor)(
-		DirectX::Blob** self) noexcept
+	DirectX::Blob* FFI(Blob_Ctor)() noexcept
 	{
-		assert(self != nullptr);
-		new (*self) DirectX::Blob;
+		return new (std::nothrow) DirectX::Blob;
 	}
 
 	void FFI(Blob_Dtor)(
@@ -622,7 +619,6 @@ extern "C"
 	HRESULT FFI(LoadFromTGAMemory)(
 		const void* pSource,
 		size_t size,
-		DirectX::TGA_FLAGS flags,
 		DirectX::TexMetadata* metadata,
 		DirectX::ScratchImage* image) noexcept
 	{
@@ -632,7 +628,6 @@ extern "C"
 
 	HRESULT FFI(LoadFromTGAFile)(
 		const wchar_t* szFile,
-		DirectX::TGA_FLAGS flags,
 		DirectX::TexMetadata* metadata,
 		DirectX::ScratchImage* image) noexcept
 	{

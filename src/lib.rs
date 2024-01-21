@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic, clippy::std_instead_of_core)]
 #![allow(clippy::missing_errors_doc, clippy::unreadable_literal)]
 
+mod bitmap_image;
 mod dxgi_format;
 mod ffi;
 mod hresult;
@@ -8,6 +9,7 @@ mod macros;
 mod texture_metadata;
 
 pub use self::{
+    bitmap_image::{Image, ScratchImage},
     dxgi_format::{Pitch, CP_FLAGS, DXGI_FORMAT, FORMAT_TYPE},
     hresult::{HResult, HResultError},
     texture_metadata::{
@@ -16,5 +18,7 @@ pub use self::{
     },
 };
 
-macros::c_opaque!(IWICImagingFactory);
-macros::c_opaque!(IWICMetadataQueryReader);
+macros::c_opaque!(pub IWICImagingFactory);
+macros::c_opaque!(pub IWICMetadataQueryReader);
+
+macros::c_opaque!(pub(crate) ScratchImageFFI);
