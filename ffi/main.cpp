@@ -3,6 +3,7 @@
 #include <functional>
 #include <new>
 #include <stdint.h>
+#include <type_traits>
 
 #include "DirectXTex.h"
 
@@ -10,183 +11,168 @@
 
 static_assert(CHAR_BIT == 8);
 
-static_assert(sizeof(DirectX::CP_FLAGS) <= 4);
-static_assert(sizeof(DirectX::FORMAT_TYPE) <= 4);
-static_assert(sizeof(DXGI_FORMAT) <= 4);
-static_assert(sizeof(HRESULT) <= 4);
+template <class T, size_t BYTES>
+static constexpr bool is_abi_compatible_v = sizeof(T) == BYTES && (std::is_integral_v<T> || std::is_enum_v<T>);
+
+static_assert(is_abi_compatible_v<DirectX::CP_FLAGS, 4>);
+static_assert(is_abi_compatible_v<DirectX::DDS_FLAGS, 4>);
+static_assert(is_abi_compatible_v<DirectX::FORMAT_TYPE, 4>);
+static_assert(is_abi_compatible_v<DirectX::TEX_ALPHA_MODE, 4>);
+static_assert(is_abi_compatible_v<DirectX::TEX_DIMENSION, 4>);
+static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG, 4>);
+static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG2, 4>);
+static_assert(is_abi_compatible_v<DirectX::TGA_FLAGS, 4>);
+static_assert(is_abi_compatible_v<DirectX::WIC_FLAGS, 4>);
+static_assert(is_abi_compatible_v<DXGI_FORMAT, 4>);
+static_assert(is_abi_compatible_v<HRESULT, 4>);
 
 extern "C"
 {
 	//---------------------------------------------------------------------------------
 	// DXGI Format Utilities
 	bool FFI(IsValid)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsValid(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsValid(fmt);
 	}
 
 	bool FFI(IsCompressed)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsCompressed(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsCompressed(fmt);
 	}
 
 	bool FFI(IsPacked)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsPacked(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsPacked(fmt);
 	}
 
 	bool FFI(IsVideo)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsVideo(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsVideo(fmt);
 	}
 
 	bool FFI(IsPlanar)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsPlanar(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsPlanar(fmt);
 	}
 
 	bool FFI(IsPalettized)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsPalettized(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsPalettized(fmt);
 	}
 
 	bool FFI(IsDepthStencil)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsDepthStencil(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsDepthStencil(fmt);
 	}
 
 	bool FFI(IsSRGB)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsSRGB(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsSRGB(fmt);
 	}
 
 	bool FFI(IsBGR)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::IsBGR(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::IsBGR(fmt);
 	}
 
 	bool FFI(IsTypeless)(
-		uint32_t fmt,
+		DXGI_FORMAT fmt,
 		bool partialTypeless) noexcept
 	{
 		return DirectX::IsTypeless(
-			static_cast<DXGI_FORMAT>(fmt),
+			fmt,
 			partialTypeless);
 	}
 
 	bool FFI(HasAlpha)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::HasAlpha(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::HasAlpha(fmt);
 	}
 
 	size_t FFI(BitsPerPixel)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::BitsPerPixel(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::BitsPerPixel(fmt);
 	}
 
 	size_t FFI(BitsPerColor)(
-		uint32_t fmt) noexcept
+		DXGI_FORMAT fmt) noexcept
 	{
-		return DirectX::BitsPerColor(
-			static_cast<DXGI_FORMAT>(fmt));
+		return DirectX::BitsPerColor(fmt);
 	}
 
-	uint32_t FFI(FormatDataType)(
-		uint32_t fmt) noexcept
+	DirectX::FORMAT_TYPE FFI(FormatDataType)(
+		DXGI_FORMAT fmt) noexcept
 	{
-		const auto result = DirectX::FormatDataType(
-			static_cast<DXGI_FORMAT>(fmt));
-		return static_cast<DirectX::FORMAT_TYPE>(result);
+		return DirectX::FormatDataType(fmt);
 	}
 
-	uint32_t FFI(ComputePitch)(
-		uint32_t fmt,
+	HRESULT FFI(ComputePitch)(
+		DXGI_FORMAT fmt,
 		size_t width,
 		size_t height,
 		size_t* rowPitch,
 		size_t* slicePitch,
-		uint32_t flags) noexcept
+		DirectX::CP_FLAGS flags) noexcept
 	{
 		assert(rowPitch != nullptr);
 		assert(slicePitch != nullptr);
-		const auto result = DirectX::ComputePitch(
-			static_cast<DXGI_FORMAT>(fmt),
+		return DirectX::ComputePitch(
+			fmt,
 			width,
 			height,
 			*rowPitch,
 			*slicePitch,
-			static_cast<DirectX::CP_FLAGS>(flags));
-		return static_cast<uint32_t>(result);
+			flags);
 	}
 
 	size_t FFI(ComputeScanlines)(
-		uint32_t fmt,
+		DXGI_FORMAT fmt,
 		size_t height) noexcept
 	{
 		return DirectX::ComputeScanlines(
-			static_cast<DXGI_FORMAT>(fmt),
+			fmt,
 			height);
 	}
 
-	uint32_t FFI(MakeSRGB)(
-		uint32_t fmt) noexcept
+	DXGI_FORMAT FFI(MakeSRGB)(
+		DXGI_FORMAT fmt) noexcept
 	{
-		const auto result = DirectX::MakeSRGB(
-			static_cast<DXGI_FORMAT>(fmt));
-		return static_cast<uint32_t>(result);
+		return DirectX::MakeSRGB(fmt);
 	}
 
-	uint32_t FFI(MakeLinear)(
-		uint32_t fmt) noexcept
+	DXGI_FORMAT FFI(MakeLinear)(
+		DXGI_FORMAT fmt) noexcept
 	{
-		const auto result = DirectX::MakeLinear(
-			static_cast<DXGI_FORMAT>(fmt));
-		return static_cast<uint32_t>(result);
+		return DirectX::MakeLinear(fmt);
 	}
 
-	uint32_t FFI(MakeTypeless)(
-		uint32_t fmt) noexcept
+	DXGI_FORMAT FFI(MakeTypeless)(
+		DXGI_FORMAT fmt) noexcept
 	{
-		const auto result = DirectX::MakeTypeless(
-			static_cast<DXGI_FORMAT>(fmt));
-		return static_cast<uint32_t>(result);
+		return DirectX::MakeTypeless(fmt);
 	}
 
-	uint32_t FFI(MakeTypelessUNORM)(
-		uint32_t fmt) noexcept
+	DXGI_FORMAT FFI(MakeTypelessUNORM)(
+		DXGI_FORMAT fmt) noexcept
 	{
-		const auto result = DirectX::MakeTypelessUNORM(
-			static_cast<DXGI_FORMAT>(fmt));
-		return static_cast<uint32_t>(result);
+		return DirectX::MakeTypelessUNORM(fmt);
 	}
 
-	uint32_t FFI(MakeTypelessFLOAT)(
-		uint32_t fmt) noexcept
+	DXGI_FORMAT FFI(MakeTypelessFLOAT)(
+		DXGI_FORMAT fmt) noexcept
 	{
-		const auto result = DirectX::MakeTypelessFLOAT(
-			static_cast<DXGI_FORMAT>(fmt));
-		return static_cast<uint32_t>(result);
+		return DirectX::MakeTypelessFLOAT(fmt);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -209,49 +195,46 @@ extern "C"
 
 	// }; struct TexMetadata
 
-	uint32_t FFI(GetMetadataFromDDSMemoryEx)(
+	HRESULT FFI(GetMetadataFromDDSMemoryEx)(
 		const uint8_t* pSource,
 		size_t size,
-		uint32_t flags,
+		DirectX::DDS_FLAGS flags,
 		DirectX::TexMetadata* metadata,
 		DirectX::DDSMetaData* ddPixelFormat) noexcept
 	{
 		assert(metadata != nullptr);
-		const auto result = DirectX::GetMetadataFromDDSMemoryEx(
+		return DirectX::GetMetadataFromDDSMemoryEx(
 			pSource,
 			size,
-			static_cast<DirectX::DDS_FLAGS>(flags),
+			flags,
 			*metadata,
 			ddPixelFormat);
-		return static_cast<uint32_t>(result);
 	}
 
-	uint32_t FFI(GetMetadataFromHDRMemory)(
+	HRESULT FFI(GetMetadataFromHDRMemory)(
 		const uint8_t* pSource,
 		size_t size,
 		DirectX::TexMetadata* metadata) noexcept
 	{
 		assert(metadata != nullptr);
-		const auto result = DirectX::GetMetadataFromHDRMemory(
+		return DirectX::GetMetadataFromHDRMemory(
 			pSource,
 			size,
 			*metadata);
-		return static_cast<uint32_t>(result);
 	}
 
-	uint32_t FFI(GetMetadataFromTGAMemory)(
+	HRESULT FFI(GetMetadataFromTGAMemory)(
 		const uint8_t* pSource,
 		size_t size,
-		uint32_t flags,
+		DirectX::TGA_FLAGS flags,
 		DirectX::TexMetadata* metadata) noexcept
 	{
 		assert(metadata != nullptr);
-		const auto result = DirectX::GetMetadataFromTGAMemory(
+		return DirectX::GetMetadataFromTGAMemory(
 			pSource,
 			size,
-			static_cast<DirectX::TGA_FLAGS>(flags),
+			flags,
 			*metadata);
-		return static_cast<uint32_t>(result);
 	}
 
 	//---------------------------------------------------------------------------------

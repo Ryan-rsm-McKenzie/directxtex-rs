@@ -1,4 +1,4 @@
-use crate::{ffi, macros, HResult, HResultError, DXGI_FORMAT};
+use crate::{ffi, macros, HResultError, DXGI_FORMAT};
 use core::ptr;
 
 type Result<T> = core::result::Result<T, HResultError>;
@@ -219,7 +219,7 @@ impl TexMetadata {
             ffi::DirectXTexFFI_GetMetadataFromDDSMemoryEx(
                 source.as_ptr(),
                 source.len(),
-                flags.bits(),
+                flags,
                 (&mut metadata).into(),
                 match dd_pixel_format {
                     Some(x) => ptr::addr_of_mut!(*x),
@@ -227,7 +227,7 @@ impl TexMetadata {
                 },
             )
         };
-        HResult::success(result.into()).map(|()| metadata)
+        result.success().map(|()| metadata)
     }
 
     pub fn from_hdr(source: &[u8]) -> Result<Self> {
@@ -239,7 +239,7 @@ impl TexMetadata {
                 (&mut metadata).into(),
             )
         };
-        HResult::success(result.into()).map(|()| metadata)
+        result.success().map(|()| metadata)
     }
 
     pub fn from_tga(source: &[u8], flags: TGA_FLAGS) -> Result<Self> {
@@ -248,11 +248,11 @@ impl TexMetadata {
             ffi::DirectXTexFFI_GetMetadataFromTGAMemory(
                 source.as_ptr(),
                 source.len(),
-                flags.bits(),
+                flags,
                 (&mut metadata).into(),
             )
         };
-        HResult::success(result.into()).map(|()| metadata)
+        result.success().map(|()| metadata)
     }
 }
 

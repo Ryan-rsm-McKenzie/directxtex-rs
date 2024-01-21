@@ -1,4 +1,4 @@
-use crate::{ffi, macros, HResult, HResultError};
+use crate::{ffi, macros, HResultError};
 
 macros::c_enum! {
     FORMAT_TYPE(u32) => {
@@ -202,118 +202,118 @@ impl DXGI_FORMAT {
 
 impl DXGI_FORMAT {
     #[must_use]
-    pub fn is_valid(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsValid(self.0) }
+    pub fn is_valid(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsValid(self) }
     }
 
     #[must_use]
-    pub fn is_compressed(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsCompressed(self.0) }
+    pub fn is_compressed(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsCompressed(self) }
     }
 
     #[must_use]
-    pub fn is_packed(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsPacked(self.0) }
+    pub fn is_packed(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsPacked(self) }
     }
 
     #[must_use]
-    pub fn is_video(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsVideo(self.0) }
+    pub fn is_video(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsVideo(self) }
     }
 
     #[must_use]
-    pub fn is_planar(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsPlanar(self.0) }
+    pub fn is_planar(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsPlanar(self) }
     }
 
     #[must_use]
-    pub fn is_palettized(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsPalettized(self.0) }
+    pub fn is_palettized(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsPalettized(self) }
     }
 
     #[must_use]
-    pub fn is_depth_stencil(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsDepthStencil(self.0) }
+    pub fn is_depth_stencil(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsDepthStencil(self) }
     }
 
     #[must_use]
-    pub fn is_srgb(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsSRGB(self.0) }
+    pub fn is_srgb(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsSRGB(self) }
     }
 
     #[must_use]
-    pub fn is_bgr(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsBGR(self.0) }
+    pub fn is_bgr(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsBGR(self) }
     }
 
     #[must_use]
-    pub fn is_typeless(&self, partial_typeless: bool) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsTypeless(self.0, partial_typeless) }
+    pub fn is_typeless(self, partial_typeless: bool) -> bool {
+        unsafe { ffi::DirectXTexFFI_IsTypeless(self, partial_typeless) }
     }
 
     #[must_use]
-    pub fn has_alpha(&self) -> bool {
-        unsafe { ffi::DirectXTexFFI_HasAlpha(self.0) }
+    pub fn has_alpha(self) -> bool {
+        unsafe { ffi::DirectXTexFFI_HasAlpha(self) }
     }
 
     #[must_use]
-    pub fn bits_per_pixel(&self) -> usize {
-        unsafe { ffi::DirectXTexFFI_BitsPerPixel(self.0) }
+    pub fn bits_per_pixel(self) -> usize {
+        unsafe { ffi::DirectXTexFFI_BitsPerPixel(self) }
     }
 
     #[must_use]
-    pub fn bits_per_color(&self) -> usize {
-        unsafe { ffi::DirectXTexFFI_BitsPerColor(self.0) }
+    pub fn bits_per_color(self) -> usize {
+        unsafe { ffi::DirectXTexFFI_BitsPerColor(self) }
     }
 
     #[must_use]
-    pub fn format_data_type(&self) -> FORMAT_TYPE {
-        unsafe { ffi::DirectXTexFFI_FormatDataType(self.0) }.into()
+    pub fn format_data_type(self) -> FORMAT_TYPE {
+        unsafe { ffi::DirectXTexFFI_FormatDataType(self) }
     }
 
-    pub fn compute_pitch(&self, width: usize, height: usize, flags: CP_FLAGS) -> Result<Pitch> {
+    pub fn compute_pitch(self, width: usize, height: usize, flags: CP_FLAGS) -> Result<Pitch> {
         let mut pitch = Pitch::default();
         let result = unsafe {
             ffi::DirectXTexFFI_ComputePitch(
-                self.0,
+                self,
                 width,
                 height,
                 (&mut pitch.row).into(),
                 (&mut pitch.slice).into(),
-                flags.bits(),
+                flags,
             )
         };
-        HResult::success(result.into()).map(|()| pitch)
+        result.success().map(|()| pitch)
     }
 
     #[must_use]
-    pub fn compute_scanlines(&self, height: usize) -> usize {
-        unsafe { ffi::DirectXTexFFI_ComputeScanlines(self.0, height) }
+    pub fn compute_scanlines(self, height: usize) -> usize {
+        unsafe { ffi::DirectXTexFFI_ComputeScanlines(self, height) }
     }
 
     #[must_use]
-    pub fn make_srgb(&self) -> Self {
-        unsafe { ffi::DirectXTexFFI_MakeSRGB(self.0) }.into()
+    pub fn make_srgb(self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeSRGB(self) }
     }
 
     #[must_use]
-    pub fn make_linear(&self) -> Self {
-        unsafe { ffi::DirectXTexFFI_MakeLinear(self.0) }.into()
+    pub fn make_linear(self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeLinear(self) }
     }
 
     #[must_use]
-    pub fn make_typeless(&self) -> Self {
-        unsafe { ffi::DirectXTexFFI_MakeTypeless(self.0) }.into()
+    pub fn make_typeless(self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeTypeless(self) }
     }
 
     #[must_use]
-    pub fn make_typeless_unorm(&self) -> Self {
-        unsafe { ffi::DirectXTexFFI_MakeTypelessUNORM(self.0) }.into()
+    pub fn make_typeless_unorm(self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeTypelessUNORM(self) }
     }
 
     #[must_use]
-    pub fn make_typeless_float(&self) -> Self {
-        unsafe { ffi::DirectXTexFFI_MakeTypelessFLOAT(self.0) }.into()
+    pub fn make_typeless_float(self) -> Self {
+        unsafe { ffi::DirectXTexFFI_MakeTypelessFLOAT(self) }
     }
 }
 

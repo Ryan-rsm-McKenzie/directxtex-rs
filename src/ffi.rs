@@ -1,4 +1,6 @@
-use crate::{DDSMetaData, TexMetadata};
+use crate::{
+    DDSMetaData, HResult, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT, FORMAT_TYPE, TGA_FLAGS,
+};
 use core::ptr::NonNull;
 
 #[repr(transparent)]
@@ -25,41 +27,41 @@ extern "C" {
     //---------------------------------------------------------------------------------
     // DXGI Format Utilities
 
-    pub(crate) fn DirectXTexFFI_IsValid(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsCompressed(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsPacked(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsVideo(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsPlanar(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsPalettized(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsDepthStencil(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsSRGB(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsBGR(fmt: u32) -> bool;
-    pub(crate) fn DirectXTexFFI_IsTypeless(fmt: u32, partialTypeless: bool) -> bool;
+    pub(crate) fn DirectXTexFFI_IsValid(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsCompressed(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsPacked(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsVideo(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsPlanar(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsPalettized(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsDepthStencil(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsSRGB(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsBGR(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) fn DirectXTexFFI_IsTypeless(fmt: DXGI_FORMAT, partialTypeless: bool) -> bool;
 
-    pub(crate) fn DirectXTexFFI_HasAlpha(fmt: u32) -> bool;
+    pub(crate) fn DirectXTexFFI_HasAlpha(fmt: DXGI_FORMAT) -> bool;
 
-    pub(crate) fn DirectXTexFFI_BitsPerPixel(fmt: u32) -> usize;
+    pub(crate) fn DirectXTexFFI_BitsPerPixel(fmt: DXGI_FORMAT) -> usize;
 
-    pub(crate) fn DirectXTexFFI_BitsPerColor(fmt: u32) -> usize;
+    pub(crate) fn DirectXTexFFI_BitsPerColor(fmt: DXGI_FORMAT) -> usize;
 
-    pub(crate) fn DirectXTexFFI_FormatDataType(fmt: u32) -> u32;
+    pub(crate) fn DirectXTexFFI_FormatDataType(fmt: DXGI_FORMAT) -> FORMAT_TYPE;
 
     pub(crate) fn DirectXTexFFI_ComputePitch(
-        fmt: u32,
+        fmt: DXGI_FORMAT,
         width: usize,
         height: usize,
         rowPitch: MutPtr<usize>,
         slicePitch: MutPtr<usize>,
-        flags: u32,
-    ) -> u32;
+        flags: CP_FLAGS,
+    ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ComputeScanlines(fmt: u32, height: usize) -> usize;
+    pub(crate) fn DirectXTexFFI_ComputeScanlines(fmt: DXGI_FORMAT, height: usize) -> usize;
 
-    pub(crate) fn DirectXTexFFI_MakeSRGB(fmt: u32) -> u32;
-    pub(crate) fn DirectXTexFFI_MakeLinear(fmt: u32) -> u32;
-    pub(crate) fn DirectXTexFFI_MakeTypeless(fmt: u32) -> u32;
-    pub(crate) fn DirectXTexFFI_MakeTypelessUNORM(fmt: u32) -> u32;
-    pub(crate) fn DirectXTexFFI_MakeTypelessFLOAT(fmt: u32) -> u32;
+    pub(crate) fn DirectXTexFFI_MakeSRGB(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeLinear(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeTypeless(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeTypelessUNORM(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) fn DirectXTexFFI_MakeTypelessFLOAT(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
 
     //---------------------------------------------------------------------------------
     // Texture metadata
@@ -74,21 +76,21 @@ extern "C" {
     pub(crate) fn DirectXTexFFI_GetMetadataFromDDSMemoryEx(
         pSource: *const u8,
         size: usize,
-        flags: u32,
+        flags: DDS_FLAGS,
         metadata: MutPtr<TexMetadata>,
         ddPixelFormat: *mut DDSMetaData,
-    ) -> u32;
+    ) -> HResult;
 
     pub(crate) fn DirectXTexFFI_GetMetadataFromHDRMemory(
         pSource: *const u8,
         size: usize,
         metadata: MutPtr<TexMetadata>,
-    ) -> u32;
+    ) -> HResult;
 
     pub(crate) fn DirectXTexFFI_GetMetadataFromTGAMemory(
         pSource: *const u8,
         size: usize,
-        flags: u32,
+        flags: TGA_FLAGS,
         metadata: MutPtr<TexMetadata>,
-    ) -> u32;
+    ) -> HResult;
 }
