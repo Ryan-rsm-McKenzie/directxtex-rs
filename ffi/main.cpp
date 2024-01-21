@@ -201,173 +201,57 @@ extern "C"
 		size_t slice) noexcept
 	{
 		assert(self != nullptr);
-		return self->ComputeIndex(mip, item, slice);
-	}
-
-	bool FFI(TexMetadata_IsCubemap)(
-		const DirectX::TexMetadata* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->IsCubemap();
-	}
-
-	bool FFI(TexMetadata_IsPMAlpha)(
-		const DirectX::TexMetadata* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->IsPMAlpha();
-	}
-
-	void FFI(TexMetadata_SetAlphaMode)(
-		struct DirectX::TexMetadata* self,
-		DirectX::TEX_ALPHA_MODE mode) noexcept
-	{
-		assert(self != nullptr);
-		return self->SetAlphaMode(mode);
-	}
-
-	DirectX::TEX_ALPHA_MODE FFI(TexMetadata_GetAlphaMode)(
-		const DirectX::TexMetadata* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->GetAlphaMode();
-	}
-
-	bool FFI(TexMetadata_IsVolumemap)(
-		const DirectX::TexMetadata* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->IsVolumemap();
+		return self->ComputeIndex(
+			mip,
+			item,
+			slice);
 	}
 
 	// }; struct TexMetadata
 
-	// struct DDSMetaData {
-
-	bool FFI(DDSMetaData_IsDX10)(
-		const DirectX::DDSMetaData* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->IsDX10();
-	}
-
-	// };
-
-	HRESULT FFI(GetMetadataFromDDSMemory)(
-		const void* pSource,
+	uint32_t FFI(GetMetadataFromDDSMemoryEx)(
+		const uint8_t* pSource,
 		size_t size,
-		DirectX::DDS_FLAGS flags,
-		DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromDDSMemory(pSource, size, flags, *metadata);
-	}
-
-	HRESULT FFI(GetMetadataFromDDSFile)(
-		const wchar_t* szFile,
-		DirectX::DDS_FLAGS flags,
-		DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromDDSFile(szFile, flags, *metadata);
-	}
-
-	HRESULT FFI(GetMetadataFromDDSMemoryEx)(
-		const void* pSource,
-		size_t size,
-		DirectX::DDS_FLAGS flags,
+		uint32_t flags,
 		DirectX::TexMetadata* metadata,
 		DirectX::DDSMetaData* ddPixelFormat) noexcept
 	{
 		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromDDSMemoryEx(pSource, size, flags, *metadata, ddPixelFormat);
+		const auto result = DirectX::GetMetadataFromDDSMemoryEx(
+			pSource,
+			size,
+			static_cast<DirectX::DDS_FLAGS>(flags),
+			*metadata,
+			ddPixelFormat);
+		return static_cast<uint32_t>(result);
 	}
 
-	HRESULT FFI(GetMetadataFromDDSFileEx)(
-		const wchar_t* szFile,
-		DirectX::DDS_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		DirectX::DDSMetaData* ddPixelFormat) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromDDSFileEx(szFile, flags, *metadata, ddPixelFormat);
-	}
-
-	HRESULT FFI(GetMetadataFromHDRMemory)(
-		const void* pSource,
+	uint32_t FFI(GetMetadataFromHDRMemory)(
+		const uint8_t* pSource,
 		size_t size,
 		DirectX::TexMetadata* metadata) noexcept
 	{
 		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromHDRMemory(pSource, size, *metadata);
+		const auto result = DirectX::GetMetadataFromHDRMemory(
+			pSource,
+			size,
+			*metadata);
+		return static_cast<uint32_t>(result);
 	}
 
-	HRESULT FFI(GetMetadataFromHDRFile)(
-		const wchar_t* szFile,
-		DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromHDRFile(szFile, *metadata);
-	}
-
-	HRESULT FFI(GetMetadataFromTGAMemory)(
-		const void* pSource,
+	uint32_t FFI(GetMetadataFromTGAMemory)(
+		const uint8_t* pSource,
 		size_t size,
-		DirectX::TGA_FLAGS flags,
+		uint32_t flags,
 		DirectX::TexMetadata* metadata) noexcept
 	{
 		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromTGAMemory(pSource, size, flags, *metadata);
-	}
-
-	HRESULT FFI(GetMetadataFromTGAFile)(
-		const wchar_t* szFile,
-		DirectX::TGA_FLAGS flags,
-		DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromTGAFile(szFile, flags, *metadata);
-	}
-
-#ifdef _WIN32
-	HRESULT FFI(GetMetadataFromWICMemory)(
-		const void* pSource,
-		size_t size,
-		DirectX::WIC_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		void (*getMQR)(IWICMetadataQueryReader*)) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromWICMemory(pSource, size, flags, *metadata, getMQR);
-	}
-
-	HRESULT FFI(GetMetadataFromWICFile)(
-		const wchar_t* szFile,
-		DirectX::WIC_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		void (*getMQR)(IWICMetadataQueryReader*)) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromWICFile(szFile, flags, *metadata, getMQR);
-	}
-#endif
-
-	// Compatability helpers
-	HRESULT FFI(GetMetadataFromTGAMemoryCompat)(
-		const void* pSource,
-		size_t size,
-		DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromTGAMemory(pSource, size, *metadata);
-	}
-
-	HRESULT FFI(GetMetadataFromTGAFileCompat)(
-		const wchar_t* szFile,
-		DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::GetMetadataFromTGAFile(szFile, *metadata);
+		const auto result = DirectX::GetMetadataFromTGAMemory(
+			pSource,
+			size,
+			static_cast<DirectX::TGA_FLAGS>(flags),
+			*metadata);
+		return static_cast<uint32_t>(result);
 	}
 
 	//---------------------------------------------------------------------------------

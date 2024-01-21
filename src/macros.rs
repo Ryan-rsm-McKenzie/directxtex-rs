@@ -1,12 +1,33 @@
 macro_rules! c_enum {
-	($enumeration:ident($underlying:ty) => { $($variant:ident = $value:literal,)* }) => {
+	(
+		$(#[doc=$enumeration_doc:literal])?
+		$enumeration:ident($underlying:ty) => {$(
+			$(#[doc=$variant_doc:literal])?
+			$variant:ident = $value:literal,
+		)*}
+	) => {
 		#[allow(non_camel_case_types)]
 		#[derive(Clone, Copy, Eq, Hash, PartialEq, PartialOrd, Ord)]
 		#[repr(transparent)]
+		$(#[doc = $enumeration_doc])?
 		pub struct $enumeration($underlying);
 
 		impl $enumeration {
-			$(pub const $variant: Self = Self($value);)*
+			$(
+				$(#[doc = $variant_doc])?
+				pub const $variant: Self = Self($value);
+			)*
+
+			#[must_use]
+			pub fn bits(&self) -> $underlying {
+				self.0
+			}
+		}
+
+		impl Default for $enumeration {
+			fn default() -> Self {
+				Self(0)
+			}
 		}
 
 		impl From<$enumeration> for $underlying {
@@ -33,3 +54,41 @@ macro_rules! c_enum {
 }
 
 pub(crate) use c_enum;
+
+macro_rules! c_bits {
+	(
+		$(#[doc=$enumeration_doc:literal])?
+		$enumeration:ident($underlying:ty) => {$(
+			$(#[doc=$variant_doc:literal])?
+			$variant:ident = $value:literal,
+		)*}
+	) => {
+		bitflags::bitflags! {
+			#[allow(non_camel_case_types)]
+			#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
+			#[repr(transparent)]
+			$(#[doc = $enumeration_doc])?
+			pub struct $enumeration: $underlying {
+				$(
+					$(#[doc = $variant_doc])?
+					const $variant = $value;
+				)*
+				const _ = !0;
+			}
+		}
+	};
+}
+
+pub(crate) use c_bits;
+
+macro_rules! c_opaque {
+    ($name:ident) => {
+        #[repr(C)]
+        pub struct $name {
+            _data: [u8; 0],
+            _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
+        }
+    };
+}
+
+pub(crate) use c_opaque;

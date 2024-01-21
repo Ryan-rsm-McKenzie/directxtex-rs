@@ -1,4 +1,23 @@
+use crate::{DDSMetaData, TexMetadata};
 use core::ptr::NonNull;
+
+#[repr(transparent)]
+pub struct ConstPtr<T>(NonNull<T>);
+
+impl<T> From<&T> for ConstPtr<T> {
+    fn from(value: &T) -> Self {
+        Self(value.into())
+    }
+}
+
+#[repr(transparent)]
+pub struct MutPtr<T>(NonNull<T>);
+
+impl<T> From<&mut T> for MutPtr<T> {
+    fn from(value: &mut T) -> Self {
+        Self(value.into())
+    }
+}
 
 #[allow(non_snake_case)]
 #[link(name = "directxtex-ffi")]
@@ -29,8 +48,8 @@ extern "C" {
         fmt: u32,
         width: usize,
         height: usize,
-        rowPitch: NonNull<usize>,
-        slicePitch: NonNull<usize>,
+        rowPitch: MutPtr<usize>,
+        slicePitch: MutPtr<usize>,
         flags: u32,
     ) -> u32;
 
@@ -41,4 +60,35 @@ extern "C" {
     pub(crate) fn DirectXTexFFI_MakeTypeless(fmt: u32) -> u32;
     pub(crate) fn DirectXTexFFI_MakeTypelessUNORM(fmt: u32) -> u32;
     pub(crate) fn DirectXTexFFI_MakeTypelessFLOAT(fmt: u32) -> u32;
+
+    //---------------------------------------------------------------------------------
+    // Texture metadata
+
+    pub(crate) fn DirectXTexFFI_TexMetadata_ComputIndex(
+        this: ConstPtr<TexMetadata>,
+        mip: usize,
+        item: usize,
+        slice: usize,
+    ) -> usize;
+
+    pub(crate) fn DirectXTexFFI_GetMetadataFromDDSMemoryEx(
+        pSource: *const u8,
+        size: usize,
+        flags: u32,
+        metadata: MutPtr<TexMetadata>,
+        ddPixelFormat: *mut DDSMetaData,
+    ) -> u32;
+
+    pub(crate) fn DirectXTexFFI_GetMetadataFromHDRMemory(
+        pSource: *const u8,
+        size: usize,
+        metadata: MutPtr<TexMetadata>,
+    ) -> u32;
+
+    pub(crate) fn DirectXTexFFI_GetMetadataFromTGAMemory(
+        pSource: *const u8,
+        size: usize,
+        flags: u32,
+        metadata: MutPtr<TexMetadata>,
+    ) -> u32;
 }

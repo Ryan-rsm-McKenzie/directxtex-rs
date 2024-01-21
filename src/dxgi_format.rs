@@ -1,4 +1,51 @@
-use crate::{ffi, macros, HResult, HResultError, CP_FLAGS, FORMAT_TYPE};
+use crate::{ffi, macros, HResult, HResultError};
+
+macros::c_enum! {
+    FORMAT_TYPE(u32) => {
+        FORMAT_TYPE_TYPELESS = 0,
+        FORMAT_TYPE_FLOAT = 1,
+        FORMAT_TYPE_UNORM = 2,
+        FORMAT_TYPE_SNORM = 3,
+        FORMAT_TYPE_UINT = 4,
+        FORMAT_TYPE_SINT = 5,
+    }
+}
+
+macros::c_bits! {
+    CP_FLAGS(u32) => {
+        /// Assume pitch is DWORD aligned instead of BYTE aligned
+        CP_FLAGS_LEGACY_DWORD = 0x1,
+
+        /// Assume pitch is 16-byte aligned instead of BYTE aligned
+        CP_FLAGS_PARAGRAPH = 0x2,
+
+        /// Assume pitch is 32-byte aligned instead of BYTE aligned
+        CP_FLAGS_YMM = 0x4,
+
+        /// Assume pitch is 64-byte aligned instead of BYTE aligned
+        CP_FLAGS_ZMM = 0x8,
+
+        /// Assume pitch is 4096-byte aligned instead of BYTE aligned
+        CP_FLAGS_PAGE4K = 0x200,
+
+        /// BC formats with malformed mipchain blocks smaller than 4x4
+        CP_FLAGS_BAD_DXTN_TAILS = 0x1000,
+
+        /// Override with a legacy 24 bits-per-pixel format size
+        CP_FLAGS_24BPP = 0x10000,
+
+        /// Override with a legacy 16 bits-per-pixel format size
+        CP_FLAGS_16BPP = 0x20000,
+
+        /// Override with a legacy 8 bits-per-pixel format size
+        CP_FLAGS_8BPP = 0x40000,
+    }
+}
+
+impl CP_FLAGS {
+    /// Normal operation
+    pub const CP_FLAGS_NONE: Self = Self::empty();
+}
 
 type Result<T> = core::result::Result<T, HResultError>;
 
@@ -153,12 +200,6 @@ impl DXGI_FORMAT {
     pub const WIN11_DXGI_FORMAT_A4B4G4R4_UNORM: Self = Self(191);
 }
 
-impl Default for DXGI_FORMAT {
-    fn default() -> Self {
-        Self::DXGI_FORMAT_UNKNOWN
-    }
-}
-
 impl DXGI_FORMAT {
     #[must_use]
     pub fn is_valid(&self) -> bool {
@@ -206,7 +247,7 @@ impl DXGI_FORMAT {
     }
 
     #[must_use]
-    pub fn is_typeless(self, partial_typeless: bool) -> bool {
+    pub fn is_typeless(&self, partial_typeless: bool) -> bool {
         unsafe { ffi::DirectXTexFFI_IsTypeless(self.0, partial_typeless) }
     }
 
@@ -242,7 +283,6 @@ impl DXGI_FORMAT {
                 flags.bits(),
             )
         };
-
         HResult::success(result.into()).map(|()| pitch)
     }
 
