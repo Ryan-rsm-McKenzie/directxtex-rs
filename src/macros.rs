@@ -1,34 +1,12 @@
-#[derive(Debug)]
-pub struct InvalidEnumRepresentation<T>(pub(crate) T);
-
-impl<T> core::fmt::Display for InvalidEnumRepresentation<T>
-where
-    T: core::fmt::Display,
-{
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{} is not a valid variant of the enumeration", self.0)
-    }
-}
-
-impl<T> std::error::Error for InvalidEnumRepresentation<T> where
-    T: core::fmt::Debug + core::fmt::Display
-{
-}
-
 macro_rules! c_enum {
 	($enumeration:ident($underlying:ty) => { $($variant:ident = $value:literal,)* }) => {
 		#[allow(non_camel_case_types)]
-		#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
+		#[derive(Clone, Copy, Eq, Hash, PartialEq, PartialOrd, Ord)]
 		#[repr(transparent)]
 		pub struct $enumeration($underlying);
 
 		impl $enumeration {
 			$(pub const $variant: Self = Self($value);)*
-
-			#[must_use]
-			pub fn from_unchecked(value: $underlying) -> Self {
-				Self(value)
-			}
 		}
 
 		impl From<$enumeration> for $underlying {
@@ -37,22 +15,17 @@ macro_rules! c_enum {
 			}
 		}
 
-		impl TryFrom<$underlying> for $enumeration {
-			type Error = crate::InvalidEnumRepresentation<$underlying>;
-
-			fn try_from(value: $underlying) -> core::result::Result<Self, Self::Error> {
-				match value {
-					$($value => Ok(Self::$variant),)*
-					_ => Err(crate::InvalidEnumRepresentation(value))
-				}
+		impl From<$underlying> for $enumeration {
+			fn from(value: $underlying) -> Self {
+				Self(value)
 			}
 		}
 
-		impl core::fmt::Display for $enumeration {
+		impl core::fmt::Debug for $enumeration {
 			fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 				match self.0 {
 					$($value => write!(f, "{}", core::stringify!($variant)),)*
-					unk => write!(f, "{unk:x}"),
+					unk => write!(f, "0x{unk:x}"),
 				}
 			}
 		}

@@ -3,56 +3,96 @@ use std::error;
 
 #[derive(Debug)]
 #[repr(transparent)]
-pub struct Error(i32);
+pub struct HResultError(HResult);
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "HRESULT 0x{:X}", self.0)
+impl HResultError {
+    #[must_use]
+    pub fn code(&self) -> u16 {
+        self.0.code()
+    }
+
+    #[must_use]
+    pub fn facility(&self) -> u16 {
+        self.0.facility()
+    }
+
+    #[must_use]
+    pub fn is_customer(&self) -> bool {
+        self.0.is_customer()
+    }
+
+    #[must_use]
+    pub fn is_microsoft(&self) -> bool {
+        self.0.is_microsoft()
+    }
+
+    #[must_use]
+    pub fn into_underlying(self) -> u32 {
+        self.0.into()
     }
 }
 
-impl error::Error for Error {}
+impl Display for HResultError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "HRESULT 0x{:08X}", self.0 .0)
+    }
+}
+
+impl error::Error for HResultError {}
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[must_use]
 #[repr(transparent)]
-pub struct HRESULT(i32);
+pub struct HResult(u32);
 
-impl HRESULT {
+impl HResult {
     #[must_use]
-    pub fn is_err(&self) -> bool {
-        !self.is_ok()
+    pub fn code(&self) -> u16 {
+        (self.0 & 0x0000_FFFF) as _
     }
 
     #[must_use]
-    pub fn is_ok(&self) -> bool {
-        self.0 >= 0
+    pub fn facility(&self) -> u16 {
+        ((self.0 & 0x07FF_0000) >> 16) as _
     }
 
-    pub fn ok(self) -> Result<(), Error> {
-        if self.is_ok() {
+    #[must_use]
+    pub fn is_customer(&self) -> bool {
+        !self.is_microsoft()
+    }
+
+    #[must_use]
+    pub fn is_failure(&self) -> bool {
+        !self.is_success()
+    }
+
+    #[must_use]
+    pub fn is_microsoft(&self) -> bool {
+        (self.0 & 0x2000_0000) == 0
+    }
+
+    #[must_use]
+    pub fn is_success(&self) -> bool {
+        (self.0 & 0x8000_0000) == 0
+    }
+
+    pub fn success(self) -> Result<(), HResultError> {
+        if self.is_success() {
             Ok(())
         } else {
-            Err(Error(self.0))
+            Err(HResultError(self))
         }
-    }
-
-    /// # Panics
-    ///
-    /// Panics if [`is_err`](Self::is_err)
-    pub fn unwrap(&self) {
-        assert!(self.is_ok(), "HRESULT 0x{:X}", self.0);
     }
 }
 
-impl From<i32> for HRESULT {
-    fn from(value: i32) -> Self {
+impl From<u32> for HResult {
+    fn from(value: u32) -> Self {
         Self(value)
     }
 }
 
-impl From<HRESULT> for i32 {
-    fn from(value: HRESULT) -> Self {
+impl From<HResult> for u32 {
+    fn from(value: HResult) -> Self {
         value.0
     }
 }

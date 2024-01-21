@@ -1,156 +1,192 @@
 #include <cassert>
-#include <cstdint>
+#include <climits>
 #include <functional>
 #include <new>
-#include <type_traits>
+#include <stdint.h>
 
 #include "DirectXTex.h"
 
 #define FFI(function) DirectXTexFFI_##function
 
-static_assert(std::is_same_v<std::underlying_type_t<DirectX::CP_FLAGS>, unsigned long>);
-static_assert(std::is_same_v<std::underlying_type_t<DirectX::FORMAT_TYPE>, int>);
-static_assert(std::is_same_v<std::underlying_type_t<DXGI_FORMAT>, int>);
+static_assert(CHAR_BIT == 8);
 
-static_assert(sizeof(HRESULT) == 4);
+static_assert(sizeof(DirectX::CP_FLAGS) <= 4);
+static_assert(sizeof(DirectX::FORMAT_TYPE) <= 4);
+static_assert(sizeof(DXGI_FORMAT) <= 4);
+static_assert(sizeof(HRESULT) <= 4);
 
 extern "C"
 {
 	//---------------------------------------------------------------------------------
 	// DXGI Format Utilities
 	bool FFI(IsValid)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsValid(fmt);
+		return DirectX::IsValid(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsCompressed)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsCompressed(fmt);
+		return DirectX::IsCompressed(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsPacked)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsPacked(fmt);
+		return DirectX::IsPacked(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsVideo)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsVideo(fmt);
+		return DirectX::IsVideo(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsPlanar)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsPlanar(fmt);
+		return DirectX::IsPlanar(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsPalettized)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsPalettized(fmt);
+		return DirectX::IsPalettized(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsDepthStencil)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsDepthStencil(fmt);
+		return DirectX::IsDepthStencil(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsSRGB)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsSRGB(fmt);
+		return DirectX::IsSRGB(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsBGR)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::IsBGR(fmt);
+		return DirectX::IsBGR(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	bool FFI(IsTypeless)(
-		DXGI_FORMAT fmt,
+		uint32_t fmt,
 		bool partialTypeless) noexcept
 	{
-		return DirectX::IsTypeless(fmt, partialTypeless);
+		return DirectX::IsTypeless(
+			static_cast<DXGI_FORMAT>(fmt),
+			partialTypeless);
 	}
 
 	bool FFI(HasAlpha)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::HasAlpha(fmt);
+		return DirectX::HasAlpha(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	size_t FFI(BitsPerPixel)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::BitsPerPixel(fmt);
+		return DirectX::BitsPerPixel(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
 	size_t FFI(BitsPerColor)(
-		DXGI_FORMAT fmt) noexcept
+		uint32_t fmt) noexcept
 	{
-		return DirectX::BitsPerColor(fmt);
+		return DirectX::BitsPerColor(
+			static_cast<DXGI_FORMAT>(fmt));
 	}
 
-	DirectX::FORMAT_TYPE FFI(FormatDataType)(
-		DXGI_FORMAT fmt) noexcept
+	uint32_t FFI(FormatDataType)(
+		uint32_t fmt) noexcept
 	{
-		return DirectX::FormatDataType(fmt);
+		const auto result = DirectX::FormatDataType(
+			static_cast<DXGI_FORMAT>(fmt));
+		return static_cast<DirectX::FORMAT_TYPE>(result);
 	}
 
-	HRESULT FFI(ComputePitch)(
-		DXGI_FORMAT fmt,
+	uint32_t FFI(ComputePitch)(
+		uint32_t fmt,
 		size_t width,
 		size_t height,
 		size_t* rowPitch,
 		size_t* slicePitch,
-		DirectX::CP_FLAGS flags) noexcept
+		uint32_t flags) noexcept
 	{
 		assert(rowPitch != nullptr);
 		assert(slicePitch != nullptr);
-		return DirectX::ComputePitch(fmt, width, height, *rowPitch, *slicePitch, flags);
+		const auto result = DirectX::ComputePitch(
+			static_cast<DXGI_FORMAT>(fmt),
+			width,
+			height,
+			*rowPitch,
+			*slicePitch,
+			static_cast<DirectX::CP_FLAGS>(flags));
+		return static_cast<uint32_t>(result);
 	}
 
 	size_t FFI(ComputeScanlines)(
-		DXGI_FORMAT fmt,
+		uint32_t fmt,
 		size_t height) noexcept
 	{
-		return DirectX::ComputeScanlines(fmt, height);
+		return DirectX::ComputeScanlines(
+			static_cast<DXGI_FORMAT>(fmt),
+			height);
 	}
 
-	DXGI_FORMAT FFI(MakeSRGB)(
-		DXGI_FORMAT fmt) noexcept
+	uint32_t FFI(MakeSRGB)(
+		uint32_t fmt) noexcept
 	{
-		return DirectX::MakeSRGB(fmt);
+		const auto result = DirectX::MakeSRGB(
+			static_cast<DXGI_FORMAT>(fmt));
+		return static_cast<uint32_t>(result);
 	}
 
-	DXGI_FORMAT FFI(MakeLinear)(
-		DXGI_FORMAT fmt) noexcept
+	uint32_t FFI(MakeLinear)(
+		uint32_t fmt) noexcept
 	{
-		return DirectX::MakeLinear(fmt);
+		const auto result = DirectX::MakeLinear(
+			static_cast<DXGI_FORMAT>(fmt));
+		return static_cast<uint32_t>(result);
 	}
 
-	DXGI_FORMAT FFI(MakeTypeless)(
-		DXGI_FORMAT fmt) noexcept
+	uint32_t FFI(MakeTypeless)(
+		uint32_t fmt) noexcept
 	{
-		return DirectX::MakeTypeless(fmt);
+		const auto result = DirectX::MakeTypeless(
+			static_cast<DXGI_FORMAT>(fmt));
+		return static_cast<uint32_t>(result);
 	}
 
-	DXGI_FORMAT FFI(MakeTypelessUNORM)(
-		DXGI_FORMAT fmt) noexcept
+	uint32_t FFI(MakeTypelessUNORM)(
+		uint32_t fmt) noexcept
 	{
-		return DirectX::MakeTypelessUNORM(fmt);
+		const auto result = DirectX::MakeTypelessUNORM(
+			static_cast<DXGI_FORMAT>(fmt));
+		return static_cast<uint32_t>(result);
 	}
 
-	DXGI_FORMAT FFI(MakeTypelessFLOAT)(
-		DXGI_FORMAT fmt) noexcept
+	uint32_t FFI(MakeTypelessFLOAT)(
+		uint32_t fmt) noexcept
 	{
-		return DirectX::MakeTypelessFLOAT(fmt);
+		const auto result = DirectX::MakeTypelessFLOAT(
+			static_cast<DXGI_FORMAT>(fmt));
+		return static_cast<uint32_t>(result);
 	}
 
 	//---------------------------------------------------------------------------------

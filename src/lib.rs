@@ -1,16 +1,18 @@
 #![warn(clippy::pedantic, clippy::std_instead_of_core)]
 #![allow(clippy::missing_errors_doc)]
 
-pub mod dxgi_format;
+mod dxgi_format;
 mod ffi;
-pub mod hresult;
+mod hresult;
 mod macros;
 
-pub use self::{dxgi_format::DXGI_FORMAT, hresult::HRESULT, macros::InvalidEnumRepresentation};
-use core::ffi::{c_int, c_ulong};
+pub use self::{
+    dxgi_format::{Pitch, DXGI_FORMAT},
+    hresult::{HResult, HResultError},
+};
 
 macros::c_enum! {
-    FORMAT_TYPE(c_int) => {
+    FORMAT_TYPE(u32) => {
         FORMAT_TYPE_TYPELESS = 0,
         FORMAT_TYPE_FLOAT = 1,
         FORMAT_TYPE_UNORM = 2,
@@ -22,9 +24,9 @@ macros::c_enum! {
 
 bitflags::bitflags! {
     #[allow(non_camel_case_types)]
-    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
     #[repr(transparent)]
-    pub struct CP_FLAGS: c_ulong {
+    pub struct CP_FLAGS: u32 {
         /// Assume pitch is DWORD aligned instead of BYTE aligned
         const CP_FLAGS_LEGACY_DWORD = 0x1;
 

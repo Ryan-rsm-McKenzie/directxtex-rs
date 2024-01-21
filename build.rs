@@ -103,4 +103,6 @@ fn main() {
     build_headers();
     build_tex();
     build_ffi();
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=ffi/main.cpp");
 }
