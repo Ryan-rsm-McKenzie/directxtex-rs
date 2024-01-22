@@ -225,4 +225,19 @@ extern "C" {
     pub(crate) fn DirectXTexFFI_ScratchImage_IsAlphaAllOpaque(
         this: ConstNonNull<ScratchImage>,
     ) -> bool;
+
+    //---------------------------------------------------------------------------------
+    // Memory blob (allocated buffer pointer is always 16-byte aligned)
+
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_Blob_Sizeof() -> usize;
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_Blob_Alignof() -> usize;
+
+    pub(crate) fn DirectXTexFFI_Blob_Initialize(this: MutNonNull<Blob>, size: usize) -> HResult;
+    pub(crate) fn DirectXTexFFI_Blob_Release(this: MutNonNull<Blob>);
+    pub(crate) fn DirectXTexFFI_Blob_GetBufferPointer(this: ConstNonNull<Blob>) -> *mut c_void;
+    pub(crate) fn DirectXTexFFI_Blob_GetBufferSize(this: ConstNonNull<Blob>) -> usize;
+    pub(crate) fn DirectXTexFFI_Blob_Resize(this: MutNonNull<Blob>, size: usize) -> HResult;
+    pub(crate) fn DirectXTexFFI_Blob_Trim(this: MutNonNull<Blob>, size: usize) -> HResult;
 }

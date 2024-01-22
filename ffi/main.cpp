@@ -460,16 +460,14 @@ extern "C"
 
 	// class Blob {
 
-	DirectX::Blob* FFI(Blob_Ctor)() noexcept
+	size_t FFI(Blob_Sizeof)() noexcept
 	{
-		return new (std::nothrow) DirectX::Blob;
+		return sizeof(DirectX::Blob);
 	}
 
-	void FFI(Blob_Dtor)(
-		DirectX::Blob* self) noexcept
+	size_t FFI(Blob_Alignof)() noexcept
 	{
-		assert(self != nullptr);
-		self->~Blob();
+		return alignof(DirectX::Blob);
 	}
 
 	HRESULT FFI(Blob_Initialize)(
