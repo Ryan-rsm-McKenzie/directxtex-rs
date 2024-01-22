@@ -11,6 +11,7 @@ mod dds_metadata;
 mod dxgi_format;
 mod enums;
 mod ffi;
+mod free_functions;
 mod hresult;
 mod image;
 mod macros;
@@ -30,6 +31,11 @@ pub use self::{
         CMSE_FLAGS, CNMAP_FLAGS, CP_FLAGS, DDS_FLAGS, FORMAT_TYPE, TEX_ALPHA_MODE,
         TEX_COMPRESS_FLAGS, TEX_DIMENSION, TEX_FILTER_FLAGS, TEX_MISC_FLAG, TEX_MISC_FLAG2,
         TEX_PMALPHA_FLAGS, TGA_FLAGS,
+    },
+    free_functions::{
+        compress, compute_normal_map, convert, convert_to_single_plane, decompress,
+        generate_mip_maps, generate_mip_maps_3d, premultiply_alpha, resize, save_dds,
+        scale_mip_maps_alpha_for_coverage,
     },
     hresult::HResultError,
     image::{Image, MeanSquaredError},

@@ -1,7 +1,7 @@
 use crate::{
     ffi::{self, prelude::*},
-    Blob, DDSMetaData, Image, Result, TexMetadata, CNMAP_FLAGS, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
-    TEX_COMPRESS_FLAGS, TEX_FILTER_FLAGS, TEX_PMALPHA_FLAGS, TGA_FLAGS,
+    free_functions as ff, Blob, DDSMetaData, Image, Result, TexMetadata, CNMAP_FLAGS, CP_FLAGS,
+    DDS_FLAGS, DXGI_FORMAT, TEX_COMPRESS_FLAGS, TEX_FILTER_FLAGS, TEX_PMALPHA_FLAGS, TGA_FLAGS,
 };
 use core::ptr;
 
@@ -251,19 +251,8 @@ impl ScratchImage {
         hr.success(result)
     }
 
-    pub fn save_dds(&self, metadata: Option<&TexMetadata>, flags: DDS_FLAGS) -> Result<Blob> {
-        let mut result = Blob::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_SaveToDDSMemory2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.unwrap_or(self.metadata()).into(),
-                flags,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+    pub fn save_dds(&self, flags: DDS_FLAGS) -> Result<Blob> {
+        ff::save_dds(self.images(), self.metadata(), flags)
     }
 
     pub fn load_hdr(source: &[u8], metadata: Option<&mut TexMetadata>) -> Result<Self> {
@@ -300,229 +289,73 @@ impl ScratchImage {
     /// Resize the image to width x height. Defaults to Fant filtering.
     ///
     /// Note for a complex resize, the result will always have mipLevels == 1
-    pub fn resize(
-        &self,
-        metadata: &TexMetadata,
-        width: usize,
-        height: usize,
-        filter: TEX_FILTER_FLAGS,
-    ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_Resize2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                width,
-                height,
-                filter,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+    pub fn resize(&self, width: usize, height: usize, filter: TEX_FILTER_FLAGS) -> Result<Self> {
+        ff::resize(self.images(), self.metadata(), width, height, filter)
     }
 
     /// Convert the image to a new format
     pub fn convert(
         &self,
-        metadata: &TexMetadata,
         format: DXGI_FORMAT,
         filter: TEX_FILTER_FLAGS,
         threshold: f32,
     ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_Convert2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                format,
-                filter,
-                threshold,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+        ff::convert(self.images(), self.metadata(), format, filter, threshold)
     }
 
     /// Converts the image from a planar format to an equivalent non-planar format
-    pub fn convert_to_single_plane(&self, metadata: &TexMetadata) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_ConvertToSinglePlane2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+    pub fn convert_to_single_plane(&self) -> Result<Self> {
+        ff::convert_to_single_plane(self.images(), self.metadata())
     }
 
     /// levels of '0' indicates a full mipchain, otherwise is generates that number of total levels (including the source base image)
     ///
     /// Defaults to Fant filtering which is equivalent to a box filter
-    pub fn generate_mip_maps(
-        &self,
-        metadata: &TexMetadata,
-        filter: TEX_FILTER_FLAGS,
-        levels: usize,
-    ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_GenerateMipMaps2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                filter,
-                levels,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+    pub fn generate_mip_maps(&self, filter: TEX_FILTER_FLAGS, levels: usize) -> Result<Self> {
+        ff::generate_mip_maps(self.images(), self.metadata(), filter, levels)
     }
 
     /// levels of '0' indicates a full mipchain, otherwise is generates that number of total levels (including the source base image)
     ///
     /// Defaults to Fant filtering which is equivalent to a box filter
-    pub fn generate_mip_maps_3d(
-        &self,
-        metadata: Option<&TexMetadata>,
-        filter: TEX_FILTER_FLAGS,
-        levels: usize,
-    ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = if let Some(metadata) = metadata {
-            unsafe {
-                ffi::DirectXTexFFI_GenerateMipMaps3D2(
-                    images.as_ffi_ptr(),
-                    images.len(),
-                    metadata.into(),
-                    filter,
-                    levels,
-                    (&mut result).into(),
-                )
-            }
-        } else {
-            unsafe {
-                ffi::DirectXTexFFI_GenerateMipMaps3D1(
-                    images.as_ffi_ptr(),
-                    images.len(),
-                    filter,
-                    levels,
-                    (&mut result).into(),
-                )
-            }
-        };
-        hr.success(result)
+    pub fn generate_mip_maps_3d(&self, filter: TEX_FILTER_FLAGS, levels: usize) -> Result<Self> {
+        ff::generate_mip_maps_3d(self.images(), Some(self.metadata()), filter, levels)
     }
 
     pub fn scale_mip_maps_alpha_for_coverage(
         &self,
-        metadata: &TexMetadata,
         item: usize,
         alpha_reference: f32,
     ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_ScaleMipMapsAlphaForCoverage(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                item,
-                alpha_reference,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+        ff::scale_mip_maps_alpha_for_coverage(self.images(), self.metadata(), item, alpha_reference)
     }
 
     /// Converts to/from a premultiplied alpha version of the texture
-    pub fn premultiply_alpha(
-        &self,
-        metadata: &TexMetadata,
-        flags: TEX_PMALPHA_FLAGS,
-    ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_PremultiplyAlpha2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                flags,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+    pub fn premultiply_alpha(&self, flags: TEX_PMALPHA_FLAGS) -> Result<Self> {
+        ff::premultiply_alpha(self.images(), self.metadata(), flags)
     }
 
     /// Note that threshold is only used by BC1. TEX_THRESHOLD_DEFAULT is a typical value to use
     pub fn compress(
         &self,
-        metadata: &TexMetadata,
         format: DXGI_FORMAT,
         compress: TEX_COMPRESS_FLAGS,
         threshold: f32,
     ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_Compress2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                format,
-                compress,
-                threshold,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+        ff::compress(self.images(), self.metadata(), format, compress, threshold)
     }
 
-    pub fn decompress(&self, metadata: &TexMetadata, format: DXGI_FORMAT) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_Decompress2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                format,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+    pub fn decompress(&self, format: DXGI_FORMAT) -> Result<Self> {
+        ff::decompress(self.images(), self.metadata(), format)
     }
 
     pub fn compute_normal_map(
         &self,
-        metadata: &TexMetadata,
         flags: CNMAP_FLAGS,
         amplitude: f32,
         format: DXGI_FORMAT,
     ) -> Result<Self> {
-        let mut result = Self::default();
-        let images = self.images();
-        let hr = unsafe {
-            ffi::DirectXTexFFI_ComputeNormalMap2(
-                images.as_ffi_ptr(),
-                images.len(),
-                metadata.into(),
-                flags,
-                amplitude,
-                format,
-                (&mut result).into(),
-            )
-        };
-        hr.success(result)
+        ff::compute_normal_map(self.images(), self.metadata(), flags, amplitude, format)
     }
 }
 
@@ -615,7 +448,7 @@ mod tests {
     fn save_dds() {
         let original = fs::read("data/ferris_wheel.dds").unwrap();
         let scratch = ScratchImage::load_dds(&original, Default::default(), None, None).unwrap();
-        let copy = scratch.save_dds(None, Default::default()).unwrap();
+        let copy = scratch.save_dds(Default::default()).unwrap();
         let copy = copy.buffer();
         assert_eq!(original.len(), copy.len());
         assert_eq!(original, copy);
