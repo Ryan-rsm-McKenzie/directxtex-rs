@@ -23,6 +23,7 @@ impl Blob {
         unsafe { ffi::DirectXTexFFI_Blob_Release(self.into()) }
     }
 
+    #[must_use]
     fn do_get_buffer(&self) -> (NonNull<u8>, usize) {
         let len = unsafe { ffi::DirectXTexFFI_Blob_GetBufferSize(self.into()) };
         let ptr = unsafe { ffi::DirectXTexFFI_Blob_GetBufferPointer(self.into()) };
@@ -30,11 +31,13 @@ impl Blob {
         (ptr, len)
     }
 
+    #[must_use]
     pub fn get_buffer(&self) -> &[u8] {
         let (ptr, len) = self.do_get_buffer();
         unsafe { slice::from_raw_parts(ptr.as_ptr(), len) }
     }
 
+    #[must_use]
     pub fn get_buffer_mut(&mut self) -> &[u8] {
         let (ptr, len) = self.do_get_buffer();
         unsafe { slice::from_raw_parts_mut(ptr.as_ptr(), len) }
@@ -60,7 +63,7 @@ impl Default for Blob {
 
 impl Drop for Blob {
     fn drop(&mut self) {
-        todo!()
+        self.release();
     }
 }
 
@@ -77,5 +80,22 @@ mod tests {
         assert_eq!(mem::align_of::<Blob>(), unsafe {
             ffi::DirectXTexFFI_Blob_Alignof()
         });
+    }
+
+    #[test]
+    fn verify_api() {
+        let mut blob = Blob::default();
+
+        blob.initialize(256).unwrap();
+        assert_eq!(blob.get_buffer().len(), 256);
+        assert_eq!(blob.get_buffer_mut().len(), 256);
+
+        blob.resize(128).unwrap();
+        assert_eq!(blob.get_buffer().len(), 128);
+
+        blob.trim(64).unwrap();
+        assert_eq!(blob.get_buffer().len(), 64);
+
+        assert!(blob.trim(128).is_err());
     }
 }
