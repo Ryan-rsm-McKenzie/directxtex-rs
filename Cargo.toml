@@ -1,7 +1,27 @@
 [package]
+description = "Unofficial Rust bindings for Microsoft's DirectXTex library"
 edition = "2021"
+include = [
+  "external/DirectX-Headers/include/*",
+  "external/DirectX-Headers/src/*",
+  "external/DirectX-Headers/LICENSE",
+  "external/DirectXMath/Inc/*",
+  "external/DirectXMath/LICENSE",
+  "external/DirectXTex/DirectXTex/*.cpp",
+  "external/DirectXTex/DirectXTex/*.h",
+  "external/DirectXTex/DirectXTex/*.inl",
+  "external/DirectXTex/LICENSE",
+  "ffi/include/sal.h",
+  "ffi/main.cpp",
+  "src/*",
+  "build.rs",
+  "Cargo.toml",
+  "LICENSE",
+]
+license = "MIT"
 name = "directxtex"
-version = "0.1.0"
+repository = "https://github.com/Ryan-rsm-McKenzie/directxtex-rs"
+version = "1.0.0"
 
 [dependencies]
 bitflags = "2.4.2"
