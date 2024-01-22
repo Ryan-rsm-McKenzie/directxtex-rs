@@ -251,7 +251,7 @@ impl ScratchImage {
         hr.success(result)
     }
 
-    pub fn save_dds(&self, flags: DDS_FLAGS, metadata: Option<&TexMetadata>) -> Result<Blob> {
+    pub fn save_dds(&self, metadata: Option<&TexMetadata>, flags: DDS_FLAGS) -> Result<Blob> {
         let mut result = Blob::default();
         let images = self.images();
         let hr = unsafe {
@@ -592,7 +592,7 @@ mod tests {
     fn save_dds() {
         let original = fs::read("data/ferris_wheel.dds").unwrap();
         let scratch = ScratchImage::load_dds(&original, Default::default(), None, None).unwrap();
-        let copy = scratch.save_dds(Default::default(), None).unwrap();
+        let copy = scratch.save_dds(None, Default::default()).unwrap();
         let copy = copy.buffer();
         assert_eq!(original.len(), copy.len());
         assert_eq!(original, copy);
