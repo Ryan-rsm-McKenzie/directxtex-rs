@@ -21,11 +21,16 @@ fn build_headers() {
     guids
         .cpp(true)
         .std("c++14")
-        .include(root.join("include"))
+        .includes(
+            ["include", "include/directx"]
+                .into_iter()
+                .map(|x| root.join(x)),
+        )
         .file(root.join("src/dxguids.cpp"));
 
     if !cfg!(windows) {
         headers.include(root.join("include/wsl/stubs"));
+        guids.include(root.join("include/wsl/stubs"));
     } else if tool.is_like_gnu() || tool.is_like_clang() {
         headers.define("__REQUIRED_RPCNDR_H_VERSION__", "475");
         guids.define("__REQUIRED_RPCNDR_H_VERSION__", "475");
