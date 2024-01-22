@@ -10,7 +10,7 @@ pub struct Blob {
 
 impl Blob {
     pub fn initialize(&mut self, size: usize) -> Result<()> {
-        unsafe { ffi::DirectXTexFFI_Blob_Initialize(self.into(), size) }.success()
+        unsafe { ffi::DirectXTexFFI_Blob_Initialize(self.into(), size) }.success(())
     }
 
     pub fn release(&mut self) {
@@ -29,12 +29,12 @@ impl Blob {
 
     /// Reallocate for a new size
     pub fn resize(&mut self, size: usize) -> Result<()> {
-        unsafe { ffi::DirectXTexFFI_Blob_Resize(self.into(), size) }.success()
+        unsafe { ffi::DirectXTexFFI_Blob_Resize(self.into(), size) }.success(())
     }
 
     /// Shorten size without reallocation
     pub fn trim(&mut self, size: usize) -> Result<()> {
-        unsafe { ffi::DirectXTexFFI_Blob_Trim(self.into(), size) }.success()
+        unsafe { ffi::DirectXTexFFI_Blob_Trim(self.into(), size) }.success(())
     }
 }
 

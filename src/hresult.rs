@@ -7,22 +7,22 @@ pub struct HResultError(HResult);
 
 impl HResultError {
     #[must_use]
-    pub fn code(&self) -> u16 {
+    pub fn code(self) -> u16 {
         self.0.code()
     }
 
     #[must_use]
-    pub fn facility(&self) -> u16 {
+    pub fn facility(self) -> u16 {
         self.0.facility()
     }
 
     #[must_use]
-    pub fn is_customer(&self) -> bool {
+    pub fn is_customer(self) -> bool {
         self.0.is_customer()
     }
 
     #[must_use]
-    pub fn is_microsoft(&self) -> bool {
+    pub fn is_microsoft(self) -> bool {
         self.0.is_microsoft()
     }
 
@@ -43,42 +43,37 @@ impl error::Error for HResultError {}
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[must_use]
 #[repr(transparent)]
-pub struct HResult(u32);
+pub(crate) struct HResult(u32);
 
 impl HResult {
     #[must_use]
-    pub fn code(&self) -> u16 {
+    pub(crate) fn code(self) -> u16 {
         (self.0 & 0x0000_FFFF) as _
     }
 
     #[must_use]
-    pub fn facility(&self) -> u16 {
+    pub(crate) fn facility(self) -> u16 {
         ((self.0 & 0x07FF_0000) >> 16) as _
     }
 
     #[must_use]
-    pub fn is_customer(&self) -> bool {
+    pub(crate) fn is_customer(self) -> bool {
         !self.is_microsoft()
     }
 
     #[must_use]
-    pub fn is_failure(&self) -> bool {
-        !self.is_success()
-    }
-
-    #[must_use]
-    pub fn is_microsoft(&self) -> bool {
+    pub(crate) fn is_microsoft(self) -> bool {
         (self.0 & 0x2000_0000) == 0
     }
 
     #[must_use]
-    pub fn is_success(&self) -> bool {
+    pub(crate) fn is_success(self) -> bool {
         (self.0 & 0x8000_0000) == 0
     }
 
-    pub fn success(self) -> Result<(), HResultError> {
+    pub(crate) fn success<T>(self, value: T) -> Result<T, HResultError> {
         if self.is_success() {
-            Ok(())
+            Ok(value)
         } else {
             Err(HResultError(self))
         }

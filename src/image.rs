@@ -18,29 +18,30 @@ pub struct Image {
 
 impl Image {
     pub fn save_dds(&self, flags: DDS_FLAGS) -> Result<Blob> {
-        let mut blob = Blob::default();
-        let result =
-            unsafe { ffi::DirectXTexFFI_SaveToDDSMemory1(self.into(), flags, (&mut blob).into()) };
-        result.success().map(|()| blob)
+        let mut result = Blob::default();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_SaveToDDSMemory1(self.into(), flags, (&mut result).into())
+        };
+        hr.success(result)
     }
 
     pub fn save_hdr(&self) -> Result<Blob> {
-        let mut blob = Blob::default();
-        let result = unsafe { ffi::DirectXTexFFI_SaveToHDRMemory(self.into(), (&mut blob).into()) };
-        result.success().map(|()| blob)
+        let mut result = Blob::default();
+        let hr = unsafe { ffi::DirectXTexFFI_SaveToHDRMemory(self.into(), (&mut result).into()) };
+        hr.success(result)
     }
 
     pub fn save_tga(&self, flags: TGA_FLAGS, metadata: Option<&TexMetadata>) -> Result<Blob> {
-        let mut blob = Blob::default();
-        let result = unsafe {
+        let mut result = Blob::default();
+        let hr = unsafe {
             ffi::DirectXTexFFI_SaveToTGAMemory(
                 self.into(),
                 flags,
-                (&mut blob).into(),
+                (&mut result).into(),
                 metadata.into_ffi_ptr(),
             )
         };
-        result.success().map(|()| blob)
+        hr.success(result)
     }
 
     /// Resize the image to width x height. Defaults to Fant filtering.
@@ -52,11 +53,11 @@ impl Image {
         height: usize,
         filter: TEX_FILTER_FLAGS,
     ) -> Result<ScratchImage> {
-        let mut image = ScratchImage::default();
-        let result = unsafe {
-            ffi::DirectXTexFFI_Resize1(self.into(), width, height, filter, (&mut image).into())
+        let mut result = ScratchImage::default();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_Resize1(self.into(), width, height, filter, (&mut result).into())
         };
-        result.success().map(|()| image)
+        hr.success(result)
     }
 
     /// Convert the image to a new format
@@ -66,19 +67,25 @@ impl Image {
         filter: TEX_FILTER_FLAGS,
         threshold: f32,
     ) -> Result<ScratchImage> {
-        let mut image = ScratchImage::default();
-        let result = unsafe {
-            ffi::DirectXTexFFI_Convert1(self.into(), format, filter, threshold, (&mut image).into())
+        let mut result = ScratchImage::default();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_Convert1(
+                self.into(),
+                format,
+                filter,
+                threshold,
+                (&mut result).into(),
+            )
         };
-        result.success().map(|()| image)
+        hr.success(result)
     }
 
     /// Converts the image from a planar format to an equivalent non-planar format
     pub fn convert_to_single_plane(&self) -> Result<ScratchImage> {
-        let mut image = ScratchImage::default();
-        let result =
-            unsafe { ffi::DirectXTexFFI_ConvertToSinglePlane1(self.into(), (&mut image).into()) };
-        result.success().map(|()| image)
+        let mut result = ScratchImage::default();
+        let hr =
+            unsafe { ffi::DirectXTexFFI_ConvertToSinglePlane1(self.into(), (&mut result).into()) };
+        hr.success(result)
     }
 
     /// levels of '0' indicates a full mipchain, otherwise is generates that number of total levels (including the source base image)
@@ -90,26 +97,26 @@ impl Image {
         levels: usize,
         allow_1d: bool,
     ) -> Result<ScratchImage> {
-        let mut mip_chain = ScratchImage::default();
-        let result = unsafe {
+        let mut result = ScratchImage::default();
+        let hr = unsafe {
             ffi::DirectXTexFFI_GenerateMipMaps1(
                 self.into(),
                 filter,
                 levels,
-                (&mut mip_chain).into(),
+                (&mut result).into(),
                 allow_1d,
             )
         };
-        result.success().map(|()| mip_chain)
+        hr.success(result)
     }
 
     /// Converts to/from a premultiplied alpha version of the texture
     pub fn premultiply_alpha(&self, flags: TEX_PMALPHA_FLAGS) -> Result<ScratchImage> {
-        let mut image = ScratchImage::default();
-        let result = unsafe {
-            ffi::DirectXTexFFI_PremultiplyAlpha1(self.into(), flags, (&mut image).into())
+        let mut result = ScratchImage::default();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_PremultiplyAlpha1(self.into(), flags, (&mut result).into())
         };
-        result.success().map(|()| image)
+        hr.success(result)
     }
 
     /// Note that threshold is only used by BC1. TEX_THRESHOLD_DEFAULT is a typical value to use
@@ -119,24 +126,24 @@ impl Image {
         compress: TEX_COMPRESS_FLAGS,
         threshold: f32,
     ) -> Result<ScratchImage> {
-        let mut image = ScratchImage::default();
-        let result = unsafe {
+        let mut result = ScratchImage::default();
+        let hr = unsafe {
             ffi::DirectXTexFFI_Compress1(
                 self.into(),
                 format,
                 compress,
                 threshold,
-                (&mut image).into(),
+                (&mut result).into(),
             )
         };
-        result.success().map(|()| image)
+        hr.success(result)
     }
 
     pub fn decompress(&self, format: DXGI_FORMAT) -> Result<ScratchImage> {
-        let mut image = ScratchImage::default();
-        let result =
-            unsafe { ffi::DirectXTexFFI_Decompress1(self.into(), format, (&mut image).into()) };
-        result.success().map(|()| image)
+        let mut result = ScratchImage::default();
+        let hr =
+            unsafe { ffi::DirectXTexFFI_Decompress1(self.into(), format, (&mut result).into()) };
+        hr.success(result)
     }
 }
 

@@ -66,42 +66,42 @@ impl TexMetadata {
         flags: DDS_FLAGS,
         dd_pixel_format: Option<&mut DDSMetaData>,
     ) -> Result<Self> {
-        let mut metadata = Self::default();
-        let result = unsafe {
+        let mut result = Self::default();
+        let hr = unsafe {
             ffi::DirectXTexFFI_GetMetadataFromDDSMemoryEx(
                 source.as_ffi_ptr(),
                 source.len(),
                 flags,
-                (&mut metadata).into(),
+                (&mut result).into(),
                 dd_pixel_format.into_ffi_ptr(),
             )
         };
-        result.success().map(|()| metadata)
+        hr.success(result)
     }
 
     pub fn from_hdr(source: &[u8]) -> Result<Self> {
-        let mut metadata = Self::default();
-        let result = unsafe {
+        let mut result = Self::default();
+        let hr = unsafe {
             ffi::DirectXTexFFI_GetMetadataFromHDRMemory(
                 source.as_ffi_ptr(),
                 source.len(),
-                (&mut metadata).into(),
+                (&mut result).into(),
             )
         };
-        result.success().map(|()| metadata)
+        hr.success(result)
     }
 
     pub fn from_tga(source: &[u8], flags: TGA_FLAGS) -> Result<Self> {
-        let mut metadata = Self::default();
-        let result = unsafe {
+        let mut result = Self::default();
+        let hr = unsafe {
             ffi::DirectXTexFFI_GetMetadataFromTGAMemory(
                 source.as_ffi_ptr(),
                 source.len(),
                 flags,
-                (&mut metadata).into(),
+                (&mut result).into(),
             )
         };
-        result.success().map(|()| metadata)
+        hr.success(result)
     }
 }
 

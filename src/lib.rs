@@ -25,11 +25,13 @@ pub use self::{
         TEX_ALPHA_MODE, TEX_COMPRESS_FLAGS, TEX_DIMENSION, TEX_FILTER_FLAGS, TEX_FR_FLAGS,
         TEX_MISC_FLAG, TEX_MISC_FLAG2, TEX_PMALPHA_FLAGS, TGA_FLAGS, WIC_FLAGS,
     },
-    hresult::{HResult, HResultError},
+    hresult::HResultError,
     image::Image,
     scratch_image::ScratchImage,
     texture_metadata::TexMetadata,
 };
+
+use hresult::HResult;
 
 pub const TEX_FILTER_DITHER_MASK: u32 = 0xF0000;
 pub const TEX_FILTER_MODE_MASK: u32 = 0xF00000;

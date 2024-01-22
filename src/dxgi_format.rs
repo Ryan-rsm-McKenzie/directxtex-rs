@@ -261,18 +261,18 @@ impl DXGI_FORMAT {
     }
 
     pub fn compute_pitch(self, width: usize, height: usize, flags: CP_FLAGS) -> Result<Pitch> {
-        let mut pitch = Pitch::default();
-        let result = unsafe {
+        let mut result = Pitch::default();
+        let hr = unsafe {
             ffi::DirectXTexFFI_ComputePitch(
                 self,
                 width,
                 height,
-                (&mut pitch.row).into(),
-                (&mut pitch.slice).into(),
+                (&mut result.row).into(),
+                (&mut result.slice).into(),
                 flags,
             )
         };
-        result.success().map(|()| pitch)
+        hr.success(result)
     }
 
     #[must_use]
