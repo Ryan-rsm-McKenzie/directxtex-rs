@@ -15,9 +15,16 @@ fn make_standard_build() -> Build {
             "external/DirectXMath/Inc",
             "external/DirectXTex/DirectXTex",
         ]);
+
     if !cfg!(windows) {
         build.includes(["external/DirectX-Headers/include/wsl/stubs", "ffi/include"]);
     }
+
+    let tool = build.get_compiler();
+    if tool.is_like_gnu() {
+        build.flag("-Wp,-w");
+    }
+
     build
 }
 
