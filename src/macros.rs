@@ -80,15 +80,3 @@ macro_rules! c_bits {
 }
 
 pub(crate) use c_bits;
-
-macro_rules! c_opaque {
-    ($visibility:vis $name:ident) => {
-        #[repr(C)]
-        $visibility struct $name {
-            _data: [u8; 0],
-            _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
-        }
-    };
-}
-
-pub(crate) use c_opaque;

@@ -27,6 +27,3 @@ pub use self::{
 };
 
 type Result<T> = core::result::Result<T, HResultError>;
-
-macros::c_opaque!(pub IWICImagingFactory);
-macros::c_opaque!(pub IWICMetadataQueryReader);
