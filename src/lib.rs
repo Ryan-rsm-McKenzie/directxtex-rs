@@ -1,17 +1,16 @@
 #![warn(clippy::pedantic, clippy::std_instead_of_core)]
 #![allow(clippy::missing_errors_doc, clippy::unreadable_literal)]
 
-mod bitmap_image;
 mod dxgi_format;
 mod enums;
 mod ffi;
 mod hresult;
 mod image;
 mod macros;
+mod scratch_image;
 mod texture_metadata;
 
 pub use self::{
-    bitmap_image::ScratchImage,
     dxgi_format::{Pitch, DXGI_FORMAT},
     enums::{
         CP_FLAGS, DDS_FLAGS, FORMAT_TYPE, TEX_ALPHA_MODE, TEX_DIMENSION, TEX_MISC_FLAG,
@@ -19,6 +18,7 @@ pub use self::{
     },
     hresult::{HResult, HResultError},
     image::Image,
+    scratch_image::ScratchImage,
     texture_metadata::{DDSMetaData, TexMetadata},
 };
 
