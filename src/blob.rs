@@ -1,7 +1,5 @@
-use crate::{ffi, HResultError};
+use crate::{ffi, Result};
 use core::{ffi::c_void, ptr};
-
-type Result<T> = core::result::Result<T, HResultError>;
 
 #[derive(Debug)]
 #[repr(C)]

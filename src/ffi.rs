@@ -3,7 +3,6 @@ use crate::{
     FORMAT_TYPE, TGA_FLAGS,
 };
 use core::{
-    ffi::c_void,
     ptr::{self, NonNull},
     slice,
 };
@@ -270,4 +269,59 @@ extern "C" {
     pub(crate) fn DirectXTexFFI_Blob_Release(this: MutNonNull<Blob>);
     pub(crate) fn DirectXTexFFI_Blob_Resize(this: MutNonNull<Blob>, size: usize) -> HResult;
     pub(crate) fn DirectXTexFFI_Blob_Trim(this: MutNonNull<Blob>, size: usize) -> HResult;
+
+    //---------------------------------------------------------------------------------
+    // Image I/O
+
+    // DDS operations
+    pub(crate) fn DirectXTexFFI_LoadFromDDSMemoryEx(
+        pSource: *const u8,
+        size: usize,
+        flags: DDS_FLAGS,
+        metadata: *mut TexMetadata,
+        ddPixelFormat: *mut DDSMetaData,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_SaveToDDSMemory1(
+        image: ConstNonNull<Image>,
+        flags: DDS_FLAGS,
+        blob: MutNonNull<Blob>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_SaveToDDSMemory2(
+        images: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        flags: DDS_FLAGS,
+        blob: MutNonNull<Blob>,
+    ) -> HResult;
+
+    // HDR operations
+    pub(crate) fn DirectXTexFFI_LoadFromHDRMemory(
+        pSource: *const u8,
+        size: usize,
+        metadata: *mut TexMetadata,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_SaveToHDRMemory(
+        image: ConstNonNull<Image>,
+        blob: MutNonNull<Blob>,
+    ) -> HResult;
+
+    // TGA operations
+    pub(crate) fn DirectXTexFFI_LoadFromTGAMemory(
+        pSource: *const u8,
+        size: usize,
+        flags: TGA_FLAGS,
+        metadata: *mut TexMetadata,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_SaveToTGAMemory(
+        image: ConstNonNull<Image>,
+        flags: TGA_FLAGS,
+        blob: MutNonNull<Blob>,
+        metadata: *const TexMetadata,
+    ) -> HResult;
 }

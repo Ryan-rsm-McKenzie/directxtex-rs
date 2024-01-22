@@ -1,10 +1,8 @@
 use crate::{
     ffi::{self, prelude::*},
-    DDSMetaData, HResultError, DDS_FLAGS, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION,
-    TEX_MISC_FLAG, TEX_MISC_FLAG2, TGA_FLAGS,
+    DDSMetaData, Result, DDS_FLAGS, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION, TEX_MISC_FLAG,
+    TEX_MISC_FLAG2, TGA_FLAGS,
 };
-
-type Result<T> = core::result::Result<T, HResultError>;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[repr(C)]
@@ -126,15 +124,31 @@ mod tests {
     #[test]
     fn from_dds() {
         let file = fs::read("data/ferris_wheel.dds").unwrap();
-        let tex = TexMetadata::from_dds(&file, Default::default(), None).unwrap();
+        let (tex, dds) = {
+            let mut dds = Default::default();
+            let tex = TexMetadata::from_dds(&file, Default::default(), Some(&mut dds)).unwrap();
+            (tex, dds)
+        };
+
         assert_eq!(tex.width, 720);
         assert_eq!(tex.height, 1280);
         assert_eq!(tex.depth, 1);
-        assert_eq!(tex.mip_levels, 11);
         assert_eq!(tex.array_size, 1);
+        assert_eq!(tex.mip_levels, 11);
+        assert_eq!(tex.misc_flags, 0);
+        assert_eq!(tex.misc_flags2, 0);
         assert_eq!(tex.format, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
         assert_eq!(tex.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(tex.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_UNKNOWN);
+
+        assert_eq!(dds.size, 32);
+        assert_eq!(dds.flags, 65);
+        assert_eq!(dds.four_cc, 0);
+        assert_eq!(dds.rgb_bit_count, 32);
+        assert_eq!(dds.r_bit_mask, 0x000000FF);
+        assert_eq!(dds.g_bit_mask, 0x0000FF00);
+        assert_eq!(dds.b_bit_mask, 0x00FF0000);
+        assert_eq!(dds.a_bit_mask, 0xFF000000);
     }
 
     #[test]
@@ -144,8 +158,10 @@ mod tests {
         assert_eq!(tex.width, 720);
         assert_eq!(tex.height, 1280);
         assert_eq!(tex.depth, 1);
-        assert_eq!(tex.mip_levels, 1);
         assert_eq!(tex.array_size, 1);
+        assert_eq!(tex.mip_levels, 1);
+        assert_eq!(tex.misc_flags, 0);
+        assert_eq!(tex.misc_flags2, 3);
         assert_eq!(tex.format, DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT);
         assert_eq!(tex.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(tex.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_OPAQUE);
@@ -158,8 +174,10 @@ mod tests {
         assert_eq!(tex.width, 720);
         assert_eq!(tex.height, 1280);
         assert_eq!(tex.depth, 1);
-        assert_eq!(tex.mip_levels, 1);
         assert_eq!(tex.array_size, 1);
+        assert_eq!(tex.mip_levels, 1);
+        assert_eq!(tex.misc_flags, 0);
+        assert_eq!(tex.misc_flags2, 0);
         assert_eq!(tex.format, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
         assert_eq!(tex.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(tex.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_UNKNOWN);

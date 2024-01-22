@@ -26,5 +26,7 @@ pub use self::{
     texture_metadata::TexMetadata,
 };
 
+type Result<T> = core::result::Result<T, HResultError>;
+
 macros::c_opaque!(pub IWICImagingFactory);
 macros::c_opaque!(pub IWICMetadataQueryReader);

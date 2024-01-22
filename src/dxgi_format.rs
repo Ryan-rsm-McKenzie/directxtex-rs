@@ -1,6 +1,4 @@
-use crate::{ffi, macros, HResultError, CP_FLAGS, FORMAT_TYPE};
-
-type Result<T> = core::result::Result<T, HResultError>;
+use crate::{ffi, macros, Result, CP_FLAGS, FORMAT_TYPE};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Pitch {

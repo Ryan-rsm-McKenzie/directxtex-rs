@@ -448,29 +448,8 @@ extern "C"
 	// Image I/O
 
 	// DDS operations
-	HRESULT FFI(LoadFromDDSMemory)(
-		const void* pSource,
-		size_t size,
-		DirectX::DDS_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromDDSMemory(pSource, size, flags, metadata, *image);
-	}
-
-	HRESULT FFI(LoadFromDDSFile)(
-		const wchar_t* szFile,
-		DirectX::DDS_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromDDSFile(szFile, flags, metadata, *image);
-	}
-
 	HRESULT FFI(LoadFromDDSMemoryEx)(
-		const void* pSource,
+		const uint8_t* pSource,
 		size_t size,
 		DirectX::DDS_FLAGS flags,
 		DirectX::TexMetadata* metadata,
@@ -479,17 +458,6 @@ extern "C"
 	{
 		assert(image != nullptr);
 		return DirectX::LoadFromDDSMemoryEx(pSource, size, flags, metadata, ddPixelFormat, *image);
-	}
-
-	HRESULT FFI(LoadFromDDSFileEx)(
-		const wchar_t* szFile,
-		DirectX::DDS_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		DirectX::DDSMetaData* ddPixelFormat,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromDDSFileEx(szFile, flags, metadata, ddPixelFormat, *image);
 	}
 
 	HRESULT FFI(SaveToDDSMemory1)(
@@ -514,43 +482,14 @@ extern "C"
 		return DirectX::SaveToDDSMemory(images, nimages, *metadata, flags, *blob);
 	}
 
-	HRESULT FFI(SaveToDDSFile1)(
-		const DirectX::Image* image,
-		DirectX::DDS_FLAGS flags,
-		const wchar_t* szFile) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::SaveToDDSFile(*image, flags, szFile);
-	}
-
-	HRESULT FFI(SaveToDDSFile2)(
-		const DirectX::Image* images,
-		size_t nimages,
-		const DirectX::TexMetadata* metadata,
-		DirectX::DDS_FLAGS flags,
-		const wchar_t* szFile) noexcept
-	{
-		assert(metadata != nullptr);
-		return DirectX::SaveToDDSFile(images, nimages, *metadata, flags, szFile);
-	}
-
 	HRESULT FFI(LoadFromHDRMemory)(
-		const void* pSource,
+		const uint8_t* pSource,
 		size_t size,
 		DirectX::TexMetadata* metadata,
 		DirectX::ScratchImage* image) noexcept
 	{
 		assert(image != nullptr);
 		return DirectX::LoadFromHDRMemory(pSource, size, metadata, *image);
-	}
-
-	HRESULT FFI(LoadFromHDRFile)(
-		const wchar_t* szFile,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromHDRFile(szFile, metadata, *image);
 	}
 
 	HRESULT FFI(SaveToHDRMemory)(
@@ -562,32 +501,16 @@ extern "C"
 		return DirectX::SaveToHDRMemory(*image, *blob);
 	}
 
-	HRESULT FFI(SaveToHDRFile)(
-		const DirectX::Image* image,
-		const wchar_t* szFile) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::SaveToHDRFile(*image, szFile);
-	}
-
 	// TGA operations
 	HRESULT FFI(LoadFromTGAMemory)(
-		const void* pSource,
+		const uint8_t* pSource,
 		size_t size,
+		DirectX::TGA_FLAGS flags,
 		DirectX::TexMetadata* metadata,
 		DirectX::ScratchImage* image) noexcept
 	{
 		assert(image != nullptr);
-		return DirectX::LoadFromTGAMemory(pSource, size, metadata, *image);
-	}
-
-	HRESULT FFI(LoadFromTGAFile)(
-		const wchar_t* szFile,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromTGAFile(szFile, metadata, *image);
+		return DirectX::LoadFromTGAMemory(pSource, size, flags, metadata, *image);
 	}
 
 	HRESULT FFI(SaveToTGAMemory)(
@@ -599,135 +522,6 @@ extern "C"
 		assert(image != nullptr);
 		assert(blob != nullptr);
 		return DirectX::SaveToTGAMemory(*image, flags, *blob, metadata);
-	}
-
-	HRESULT FFI(SaveToTGAFile)(
-		const DirectX::Image* image,
-		DirectX::TGA_FLAGS flags,
-		const wchar_t* szFile,
-		const DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::SaveToTGAFile(*image, flags, szFile, metadata);
-	}
-
-	// WIC operations
-#ifdef _WIN32
-	HRESULT FFI(LoadFromWICMemory)(
-		const void* pSource,
-		size_t size,
-		DirectX::WIC_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image,
-		void (*getMQR)(IWICMetadataQueryReader*)) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromWICMemory(pSource, size, flags, metadata, *image, getMQR);
-	}
-
-	HRESULT FFI(LoadFromWICFile)(
-		const wchar_t* szFile,
-		DirectX::WIC_FLAGS flags,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image,
-		void (*getMQR)(IWICMetadataQueryReader*)) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromWICFile(szFile, flags, metadata, *image, getMQR);
-	}
-
-	HRESULT FFI(SaveToWICMemory1)(
-		const DirectX::Image* image,
-		DirectX::WIC_FLAGS flags,
-		const GUID* guidContainerFormat,
-		DirectX::Blob* blob,
-		const GUID* targetFormat,
-		void(setCustomProps)(IPropertyBag2*)) noexcept
-	{
-		assert(image != nullptr);
-		assert(guidContainerFormat != nullptr);
-		assert(blob != nullptr);
-		return DirectX::SaveToWICMemory(*image, flags, *guidContainerFormat, *blob, targetFormat, setCustomProps);
-	}
-
-	HRESULT FFI(SaveToWICMemory2)(
-		const DirectX::Image* images,
-		size_t nimages,
-		DirectX::WIC_FLAGS flags,
-		const GUID* guidContainerFormat,
-		DirectX::Blob* blob,
-		const GUID* targetFormat,
-		void(setCustomProps)(IPropertyBag2*)) noexcept
-	{
-		assert(guidContainerFormat != nullptr);
-		assert(blob != nullptr);
-		return DirectX::SaveToWICMemory(images, nimages, flags, *guidContainerFormat, *blob, targetFormat, setCustomProps);
-	}
-
-	HRESULT FFI(SaveToWICFile1)(
-		const DirectX::Image* image,
-		DirectX::WIC_FLAGS flags,
-		const GUID* guidContainerFormat,
-		const wchar_t* szFile,
-		const GUID* targetFormat,
-		void(setCustomProps)(IPropertyBag2*)) noexcept
-	{
-		assert(image != nullptr);
-		assert(guidContainerFormat != nullptr);
-		return DirectX::SaveToWICFile(*image, flags, *guidContainerFormat, szFile, targetFormat, setCustomProps);
-	}
-
-	HRESULT FFI(SaveToWICFile2)(
-		const DirectX::Image* images,
-		size_t nimages,
-		DirectX::WIC_FLAGS flags,
-		const GUID* guidContainerFormat,
-		const wchar_t* szFile,
-		const GUID* targetFormat,
-		void(setCustomProps)(IPropertyBag2*)) noexcept
-	{
-		assert(guidContainerFormat != nullptr);
-		return DirectX::SaveToWICFile(images, nimages, flags, *guidContainerFormat, szFile, targetFormat, setCustomProps);
-	}
-#endif
-
-	// Compatability helpers
-	HRESULT FFI(LoadFromTGAMemoryCompat)(
-		const void* pSource,
-		size_t size,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromTGAMemory(pSource, size, metadata, *image);
-	}
-
-	HRESULT FFI(LoadFromTGAFileCompat)(
-		const wchar_t* szFile,
-		DirectX::TexMetadata* metadata,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::LoadFromTGAFile(szFile, metadata, *image);
-	}
-
-	HRESULT FFI(SaveToTGAMemoryCompat)(
-		const DirectX::Image* image,
-		DirectX::Blob* blob,
-		const DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(image != nullptr);
-		assert(blob != nullptr);
-		return DirectX::SaveToTGAMemory(*image, *blob, metadata);
-	}
-
-	HRESULT FFI(SaveToTGAFileCompat)(
-		const DirectX::Image* image,
-		const wchar_t* szFile,
-		const DirectX::TexMetadata* metadata) noexcept
-	{
-		assert(image != nullptr);
-		return DirectX::SaveToTGAFile(*image, szFile, metadata);
 	}
 
 	//---------------------------------------------------------------------------------
