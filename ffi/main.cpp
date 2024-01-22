@@ -34,6 +34,8 @@ static_assert(is_abi_compatible_v<DirectX::WIC_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DXGI_FORMAT, 4>);
 static_assert(is_abi_compatible_v<HRESULT, 4>);
 
+static_assert(sizeof(float) == 4);
+
 extern "C"
 {
 	//---------------------------------------------------------------------------------
@@ -535,30 +537,6 @@ extern "C"
 	//---------------------------------------------------------------------------------
 	// Texture conversion, resizing, mipmap generation, and block compression
 
-#ifdef _WIN32
-	HRESULT FFI(FlipRotate)(
-		const DirectX::Image* srcImage,
-		DirectX::TEX_FR_FLAGS flags,
-		DirectX::ScratchImage* image) noexcept
-	{
-		assert(srcImage != nullptr);
-		assert(image != nullptr);
-		return DirectX::FlipRotate(*srcImage, flags, *image);
-	}
-
-	HRESULT FFI(FlipRotate2)(
-		const DirectX::Image* srcImages,
-		size_t nimages,
-		const DirectX::TexMetadata* metadata,
-		DirectX::TEX_FR_FLAGS flags,
-		DirectX::ScratchImage* result) noexcept
-	{
-		assert(metadata != nullptr);
-		assert(result != nullptr);
-		return DirectX::FlipRotate(srcImages, nimages, *metadata, flags, *result);
-	}
-#endif
-
 	HRESULT FFI(Resize1)(
 		const DirectX::Image* srcImage,
 		size_t width,
@@ -609,34 +587,6 @@ extern "C"
 		assert(metadata != nullptr);
 		assert(result != nullptr);
 		return DirectX::Convert(srcImages, nimages, *metadata, format, filter, threshold, *result);
-	}
-
-	HRESULT FFI(ConvertEx1)(
-		const DirectX::Image* srcImage,
-		DXGI_FORMAT format,
-		const DirectX::ConvertOptions* options,
-		DirectX::ScratchImage* image,
-		bool (*statusCallBack)(size_t, size_t)) noexcept
-	{
-		assert(srcImage != nullptr);
-		assert(options != nullptr);
-		assert(image != nullptr);
-		return DirectX::ConvertEx(*srcImage, format, *options, *image, statusCallBack);
-	}
-
-	HRESULT FFI(ConvertEx2)(
-		const DirectX::Image* srcImages,
-		size_t nimages,
-		const DirectX::TexMetadata* metadata,
-		DXGI_FORMAT format,
-		const DirectX::ConvertOptions* options,
-		DirectX::ScratchImage* result,
-		bool (*statusCallBack)(size_t, size_t)) noexcept
-	{
-		assert(metadata != nullptr);
-		assert(options != nullptr);
-		assert(result != nullptr);
-		return DirectX::ConvertEx(srcImages, nimages, *metadata, format, *options, *result, statusCallBack);
 	}
 
 	HRESULT FFI(ConvertToSinglePlane1)(
@@ -791,6 +741,9 @@ extern "C"
 		return DirectX::Decompress(cImages, nimages, *metadata, format, *images);
 	}
 
+	//---------------------------------------------------------------------------------
+	// Normal map operations
+
 	HRESULT FFI(ComputeNormalMap1)(
 		const DirectX::Image* srcImage,
 		DirectX::CNMAP_FLAGS flags,
@@ -816,6 +769,9 @@ extern "C"
 		assert(normalMaps != nullptr);
 		return DirectX::ComputeNormalMap(srcImages, nimages, *metadata, flags, amplitude, format, *normalMaps);
 	}
+
+	//---------------------------------------------------------------------------------
+	// Misc image operations
 
 	HRESULT FFI(CopyRectangle)(
 		const DirectX::Image* srcImage,

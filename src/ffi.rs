@@ -1,6 +1,6 @@
 use crate::{
     Blob, DDSMetaData, HResult, Image, ScratchImage, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
-    FORMAT_TYPE, TGA_FLAGS,
+    FORMAT_TYPE, TEX_COMPRESS_FLAGS, TEX_FILTER_FLAGS, TEX_PMALPHA_FLAGS, TGA_FLAGS,
 };
 use core::{
     ptr::{self, NonNull},
@@ -323,5 +323,137 @@ extern "C" {
         flags: TGA_FLAGS,
         blob: MutNonNull<Blob>,
         metadata: *const TexMetadata,
+    ) -> HResult;
+
+    //---------------------------------------------------------------------------------
+    // Texture conversion, resizing, mipmap generation, and block compression
+
+    pub(crate) fn DirectXTexFFI_Resize1(
+        srcImage: ConstNonNull<Image>,
+        width: usize,
+        height: usize,
+        filter: TEX_FILTER_FLAGS,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_Resize2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        width: usize,
+        height: usize,
+        filter: TEX_FILTER_FLAGS,
+        result: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_Convert1(
+        srcImage: ConstNonNull<Image>,
+        format: DXGI_FORMAT,
+        filter: TEX_FILTER_FLAGS,
+        threshold: f32,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_Convert2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        format: DXGI_FORMAT,
+        filter: TEX_FILTER_FLAGS,
+        threshold: f32,
+        result: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_ConvertToSinglePlane1(
+        srcImage: ConstNonNull<Image>,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ConvertToSinglePlane2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_GenerateMipMaps1(
+        baseImage: ConstNonNull<Image>,
+        filter: TEX_FILTER_FLAGS,
+        levels: usize,
+        mipChain: MutNonNull<ScratchImage>,
+        allow1D: bool,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_GenerateMipMaps2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        filter: TEX_FILTER_FLAGS,
+        levels: usize,
+        mipChain: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_GenerateMipMaps3D1(
+        baseImages: *const Image,
+        depth: usize,
+        filter: TEX_FILTER_FLAGS,
+        levels: usize,
+        mipChain: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_GenerateMipMaps3D2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        filter: TEX_FILTER_FLAGS,
+        levels: usize,
+        mipChain: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_ScaleMipMapsAlphaForCoverage(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        item: usize,
+        alphaReference: f32,
+        mipChain: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_PremultiplyAlpha1(
+        srcImage: ConstNonNull<Image>,
+        flags: TEX_PMALPHA_FLAGS,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_PremultiplyAlpha2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        flags: TEX_PMALPHA_FLAGS,
+        result: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_Compress1(
+        srcImage: ConstNonNull<Image>,
+        format: DXGI_FORMAT,
+        compress: TEX_COMPRESS_FLAGS,
+        threshold: f32,
+        cImage: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_Compress2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        format: DXGI_FORMAT,
+        compress: TEX_COMPRESS_FLAGS,
+        threshold: f32,
+        cImages: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_Decompress1(
+        cImage: ConstNonNull<Image>,
+        format: DXGI_FORMAT,
+        image: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_Decompress2(
+        cImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        format: DXGI_FORMAT,
+        images: MutNonNull<ScratchImage>,
     ) -> HResult;
 }
