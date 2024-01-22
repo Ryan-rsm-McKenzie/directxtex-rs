@@ -86,7 +86,7 @@ fn build_tex() {
             )
             .object("Ole32.lib");
     } else {
-        build.include("external/DirectX-Headers/include/wsl/stubs");
+        build.includes(["external/DirectX-Headers/include/wsl/stubs", "ffi/include"]);
     }
 
     build.compile("DirectXTex");
