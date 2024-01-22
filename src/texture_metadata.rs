@@ -1,8 +1,8 @@
 use crate::{
-    ffi, DDSMetaData, HResultError, DDS_FLAGS, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION,
+    ffi::{self, prelude::*},
+    DDSMetaData, HResultError, DDS_FLAGS, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION,
     TEX_MISC_FLAG, TEX_MISC_FLAG2, TGA_FLAGS,
 };
-use core::ptr;
 
 type Result<T> = core::result::Result<T, HResultError>;
 
@@ -71,14 +71,11 @@ impl TexMetadata {
         let mut metadata = Self::default();
         let result = unsafe {
             ffi::DirectXTexFFI_GetMetadataFromDDSMemoryEx(
-                source.as_ptr(),
+                source.as_ffi_ptr(),
                 source.len(),
                 flags,
                 (&mut metadata).into(),
-                match dd_pixel_format {
-                    Some(x) => ptr::addr_of_mut!(*x),
-                    None => ptr::null_mut(),
-                },
+                dd_pixel_format.into_ffi_ptr(),
             )
         };
         result.success().map(|()| metadata)
@@ -88,7 +85,7 @@ impl TexMetadata {
         let mut metadata = Self::default();
         let result = unsafe {
             ffi::DirectXTexFFI_GetMetadataFromHDRMemory(
-                source.as_ptr(),
+                source.as_ffi_ptr(),
                 source.len(),
                 (&mut metadata).into(),
             )
@@ -100,7 +97,7 @@ impl TexMetadata {
         let mut metadata = Self::default();
         let result = unsafe {
             ffi::DirectXTexFFI_GetMetadataFromTGAMemory(
-                source.as_ptr(),
+                source.as_ffi_ptr(),
                 source.len(),
                 flags,
                 (&mut metadata).into(),

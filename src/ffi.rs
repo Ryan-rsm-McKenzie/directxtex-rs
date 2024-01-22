@@ -2,7 +2,65 @@ use crate::{
     Blob, DDSMetaData, HResult, Image, ScratchImage, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
     FORMAT_TYPE, TGA_FLAGS,
 };
-use core::ptr::NonNull;
+use core::{
+    ffi::c_void,
+    ptr::{self, NonNull},
+    slice,
+};
+
+pub(crate) mod prelude {
+    pub(crate) use super::OptionExt as _;
+    pub(crate) use super::SliceExt as _;
+}
+
+pub(crate) trait SliceExt<T> {
+    fn as_ffi_ptr(&self) -> *const T;
+}
+
+impl<T> SliceExt<T> for [T] {
+    fn as_ffi_ptr(&self) -> *const T {
+        if self.is_empty() {
+            ptr::null()
+        } else {
+            self.as_ptr()
+        }
+    }
+}
+
+pub(crate) trait OptionExt {
+    type Item;
+    fn into_ffi_ptr(self) -> Self::Item;
+}
+
+impl<T> OptionExt for Option<&T> {
+    type Item = *const T;
+    fn into_ffi_ptr(self) -> *const T {
+        match self {
+            Some(some) => ptr::addr_of!(*some),
+            None => ptr::null(),
+        }
+    }
+}
+
+impl<T> OptionExt for Option<&mut T> {
+    type Item = *mut T;
+    fn into_ffi_ptr(self) -> *mut T {
+        match self {
+            Some(some) => ptr::addr_of_mut!(*some),
+            None => ptr::null_mut(),
+        }
+    }
+}
+
+pub(crate) unsafe fn from_raw_ffi_parts<'a, T>(data: *const T, len: usize) -> &'a [T] {
+    let data = NonNull::new(data.cast_mut()).unwrap_or(NonNull::dangling());
+    slice::from_raw_parts(data.as_ptr(), len)
+}
+
+pub(crate) unsafe fn from_raw_ffi_parts_mut<'a, T>(data: *mut T, len: usize) -> &'a mut [T] {
+    let data = NonNull::new(data).unwrap_or(NonNull::dangling());
+    slice::from_raw_parts_mut(data.as_ptr(), len)
+}
 
 #[repr(transparent)]
 pub(crate) struct ConstNonNull<T>(NonNull<T>);

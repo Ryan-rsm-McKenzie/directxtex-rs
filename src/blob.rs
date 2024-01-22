@@ -1,9 +1,5 @@
 use crate::{ffi, HResultError};
-use core::{
-    ffi::c_void,
-    ptr::{self, NonNull},
-    slice,
-};
+use core::{ffi::c_void, ptr};
 
 type Result<T> = core::result::Result<T, HResultError>;
 
@@ -24,22 +20,13 @@ impl Blob {
     }
 
     #[must_use]
-    fn do_get_buffer(&self) -> (NonNull<u8>, usize) {
-        let len = self.m_size;
-        let ptr = NonNull::new(self.m_buffer.cast::<u8>()).unwrap_or(NonNull::dangling());
-        (ptr, len)
-    }
-
-    #[must_use]
     pub fn get_buffer(&self) -> &[u8] {
-        let (ptr, len) = self.do_get_buffer();
-        unsafe { slice::from_raw_parts(ptr.as_ptr(), len) }
+        unsafe { ffi::from_raw_ffi_parts(self.m_buffer.cast(), self.m_size) }
     }
 
     #[must_use]
     pub fn get_buffer_mut(&mut self) -> &[u8] {
-        let (ptr, len) = self.do_get_buffer();
-        unsafe { slice::from_raw_parts_mut(ptr.as_ptr(), len) }
+        unsafe { ffi::from_raw_ffi_parts_mut(self.m_buffer.cast(), self.m_size) }
     }
 
     pub fn resize(&mut self, size: usize) -> Result<()> {

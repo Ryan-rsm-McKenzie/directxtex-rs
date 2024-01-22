@@ -1,8 +1,8 @@
-use crate::{ffi, HResultError, Image, TexMetadata, CP_FLAGS, DXGI_FORMAT};
-use core::{
-    ptr::{self, NonNull},
-    slice,
+use crate::{
+    ffi::{self, prelude::*},
+    DDSMetaData, HResultError, Image, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
 };
+use core::ptr;
 
 type Result<T> = core::result::Result<T, HResultError>;
 
@@ -157,7 +157,7 @@ impl ScratchImage {
         let result = unsafe {
             ffi::DirectXTexFFI_ScratchImage_InitializeArrayFromImages(
                 self.into(),
-                images.as_ptr(),
+                images.as_ffi_ptr(),
                 images.len(),
                 allow_1d,
                 flags,
@@ -170,7 +170,7 @@ impl ScratchImage {
         let result = unsafe {
             ffi::DirectXTexFFI_ScratchImage_InitializeCubeFromImages(
                 self.into(),
-                images.as_ptr(),
+                images.as_ffi_ptr(),
                 images.len(),
                 flags,
             )
@@ -182,7 +182,7 @@ impl ScratchImage {
         let result = unsafe {
             ffi::DirectXTexFFI_ScratchImage_Initialize3DFromImages(
                 self.into(),
-                images.as_ptr(),
+                images.as_ffi_ptr(),
                 images.len(),
                 flags,
             )
@@ -214,28 +214,17 @@ impl ScratchImage {
 
     #[must_use]
     pub fn get_images(&self) -> &[Image] {
-        let len = self.m_nimages;
-        let ptr = NonNull::new(self.m_image).unwrap_or(NonNull::dangling());
-        unsafe { slice::from_raw_parts(ptr.as_ptr(), len) }
-    }
-
-    #[must_use]
-    pub fn do_get_pixels(&self) -> (NonNull<u8>, usize) {
-        let len = self.m_size;
-        let ptr = NonNull::new(self.m_memory).unwrap_or(NonNull::dangling());
-        (ptr, len)
+        unsafe { ffi::from_raw_ffi_parts(self.m_image, self.m_nimages) }
     }
 
     #[must_use]
     pub fn get_pixels(&self) -> &[u8] {
-        let (ptr, len) = self.do_get_pixels();
-        unsafe { slice::from_raw_parts(ptr.as_ptr(), len) }
+        unsafe { ffi::from_raw_ffi_parts(self.m_memory, self.m_size) }
     }
 
     #[must_use]
     pub fn get_pixels_mut(&mut self) -> &mut [u8] {
-        let (ptr, len) = self.do_get_pixels();
-        unsafe { slice::from_raw_parts_mut(ptr.as_ptr(), len) }
+        unsafe { ffi::from_raw_ffi_parts_mut(self.m_memory, self.m_size) }
     }
 
     #[must_use]
