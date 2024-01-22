@@ -77,12 +77,12 @@ mod tests {
         let original = fs::read("data/ferris_wheel.hdr").unwrap();
         let scratch = ScratchImage::load_hdr(&original, None).unwrap();
 
-        let images = scratch.get_images();
+        let images = scratch.images();
         assert_eq!(images.len(), 1);
 
         let image = &images[0];
         let copy = image.save_hdr().unwrap();
-        let copy = copy.get_buffer();
+        let copy = copy.buffer();
 
         assert_eq!(original.len(), copy.len());
         assert_eq!(original, copy);
@@ -93,12 +93,12 @@ mod tests {
         let original = fs::read("data/ferris_wheel.tga").unwrap();
         let scratch = ScratchImage::load_tga(&original, Default::default(), None).unwrap();
 
-        let images = scratch.get_images();
+        let images = scratch.images();
         assert_eq!(images.len(), 1);
 
         let image = &images[0];
         let copy = image.save_tga(Default::default(), None).unwrap();
-        let copy = copy.get_buffer();
+        let copy = copy.buffer();
 
         assert_eq!(original.len(), copy.len());
         assert_eq!(original, copy);

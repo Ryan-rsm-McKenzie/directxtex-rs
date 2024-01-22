@@ -199,29 +199,29 @@ impl ScratchImage {
     }
 
     #[must_use]
-    pub fn get_metadata(&self) -> &TexMetadata {
+    pub fn metadata(&self) -> &TexMetadata {
         &self.m_metadata
     }
 
     #[must_use]
-    pub fn get_image(&self, mip: usize, item: usize, slice: usize) -> Option<&Image> {
+    pub fn image(&self, mip: usize, item: usize, slice: usize) -> Option<&Image> {
         let result =
             unsafe { ffi::DirectXTexFFI_ScratchImage_GetImage(self.into(), mip, item, slice) };
         unsafe { result.as_ref() }
     }
 
     #[must_use]
-    pub fn get_images(&self) -> &[Image] {
+    pub fn images(&self) -> &[Image] {
         unsafe { ffi::from_raw_ffi_parts(self.m_image, self.m_nimages) }
     }
 
     #[must_use]
-    pub fn get_pixels(&self) -> &[u8] {
+    pub fn pixels(&self) -> &[u8] {
         unsafe { ffi::from_raw_ffi_parts(self.m_memory, self.m_size) }
     }
 
     #[must_use]
-    pub fn get_pixels_mut(&mut self) -> &mut [u8] {
+    pub fn pixels_mut(&mut self) -> &mut [u8] {
         unsafe { ffi::from_raw_ffi_parts_mut(self.m_memory, self.m_size) }
     }
 
@@ -252,12 +252,12 @@ impl ScratchImage {
 
     pub fn save_dds(&self, flags: DDS_FLAGS, metadata: Option<&TexMetadata>) -> Result<Blob> {
         let mut blob = Blob::default();
-        let images = self.get_images();
+        let images = self.images();
         let result = unsafe {
             ffi::DirectXTexFFI_SaveToDDSMemory2(
                 images.as_ffi_ptr(),
                 images.len(),
-                metadata.unwrap_or(self.get_metadata()).into(),
+                metadata.unwrap_or(self.metadata()).into(),
                 flags,
                 (&mut blob).into(),
             )
@@ -352,10 +352,10 @@ mod tests {
         assert_eq!(dds.b_bit_mask, 0x00FF0000);
         assert_eq!(dds.a_bit_mask, 0xFF000000);
 
-        assert_eq!(scratch.get_metadata(), &meta);
-        assert_eq!(scratch.get_pixels().len(), 4915052);
+        assert_eq!(scratch.metadata(), &meta);
+        assert_eq!(scratch.pixels().len(), 4915052);
 
-        let images = scratch.get_images();
+        let images = scratch.images();
         assert_eq!(images.len(), 11);
 
         let mut index = 0;
@@ -387,7 +387,7 @@ mod tests {
         let original = fs::read("data/ferris_wheel.dds").unwrap();
         let scratch = ScratchImage::load_dds(&original, Default::default(), None, None).unwrap();
         let copy = scratch.save_dds(Default::default(), None).unwrap();
-        let copy = copy.get_buffer();
+        let copy = copy.buffer();
         assert_eq!(original.len(), copy.len());
         assert_eq!(original, copy);
     }
@@ -412,8 +412,8 @@ mod tests {
         assert_eq!(meta.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(meta.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_OPAQUE);
 
-        assert_ne!(scratch.get_metadata(), &meta);
-        let tex = scratch.get_metadata();
+        assert_ne!(scratch.metadata(), &meta);
+        let tex = scratch.metadata();
         assert_eq!(tex.width, 720);
         assert_eq!(tex.height, 1280);
         assert_eq!(tex.depth, 1);
@@ -425,9 +425,9 @@ mod tests {
         assert_eq!(tex.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(tex.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_UNKNOWN);
 
-        assert_eq!(scratch.get_pixels().len(), 14745600);
+        assert_eq!(scratch.pixels().len(), 14745600);
 
-        let images = scratch.get_images();
+        let images = scratch.images();
         assert_eq!(images.len(), 1);
         assert_eq!(images[0].width, 720);
         assert_eq!(images[0].height, 1280);
@@ -460,8 +460,8 @@ mod tests {
         assert_eq!(meta.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(meta.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_OPAQUE);
 
-        assert_ne!(scratch.get_metadata(), &meta);
-        let tex = scratch.get_metadata();
+        assert_ne!(scratch.metadata(), &meta);
+        let tex = scratch.metadata();
         assert_eq!(tex.width, 720);
         assert_eq!(tex.height, 1280);
         assert_eq!(tex.depth, 1);
@@ -473,9 +473,9 @@ mod tests {
         assert_eq!(tex.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(tex.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_UNKNOWN);
 
-        assert_eq!(scratch.get_pixels().len(), 3686400);
+        assert_eq!(scratch.pixels().len(), 3686400);
 
-        let images = scratch.get_images();
+        let images = scratch.images();
         assert_eq!(images.len(), 1);
         assert_eq!(images[0].width, 720);
         assert_eq!(images[0].height, 1280);

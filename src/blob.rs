@@ -18,12 +18,12 @@ impl Blob {
     }
 
     #[must_use]
-    pub fn get_buffer(&self) -> &[u8] {
+    pub fn buffer(&self) -> &[u8] {
         unsafe { ffi::from_raw_ffi_parts(self.m_buffer.cast(), self.m_size) }
     }
 
     #[must_use]
-    pub fn get_buffer_mut(&mut self) -> &[u8] {
+    pub fn buffer_mut(&mut self) -> &[u8] {
         unsafe { ffi::from_raw_ffi_parts_mut(self.m_buffer.cast(), self.m_size) }
     }
 
@@ -71,14 +71,14 @@ mod tests {
         let mut blob = Blob::default();
 
         blob.initialize(256).unwrap();
-        assert_eq!(blob.get_buffer().len(), 256);
-        assert_eq!(blob.get_buffer_mut().len(), 256);
+        assert_eq!(blob.buffer().len(), 256);
+        assert_eq!(blob.buffer_mut().len(), 256);
 
         blob.resize(128).unwrap();
-        assert_eq!(blob.get_buffer().len(), 128);
+        assert_eq!(blob.buffer().len(), 128);
 
         blob.trim(64).unwrap();
-        assert_eq!(blob.get_buffer().len(), 64);
+        assert_eq!(blob.buffer().len(), 64);
 
         assert!(blob.trim(128).is_err());
     }
