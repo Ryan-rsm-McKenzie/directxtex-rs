@@ -106,7 +106,11 @@ fn build_ffi() {
         .std("c++17")
         .file(root.join("main.cpp"))
         .include(root)
-        .include("external/DirectXTex/DirectXTex");
+        .includes([
+            "external/DirectX-Headers/Include",
+            "external/DirectXMath/Inc",
+            "external/DirectXTex/DirectXTex",
+        ]);
     build.compile("directxtex-ffi");
 }
 
