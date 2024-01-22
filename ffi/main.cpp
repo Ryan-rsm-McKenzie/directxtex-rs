@@ -30,6 +30,7 @@ extern "C"
 {
 	//---------------------------------------------------------------------------------
 	// DXGI Format Utilities
+
 	bool FFI(IsValid)(
 		DXGI_FORMAT fmt) noexcept
 	{
@@ -178,6 +179,16 @@ extern "C"
 	//---------------------------------------------------------------------------------
 	// Texture metadata
 
+	size_t FFI(TexMetadata_Sizeof)() noexcept
+	{
+		return sizeof(DirectX::TexMetadata);
+	}
+
+	size_t FFI(DDSMetaData_Sizeof)() noexcept
+	{
+		return sizeof(DirectX::DDSMetaData);
+	}
+
 	// struct TexMetadata {
 
 	size_t FFI(TexMetadata_ComputIndex)(
@@ -240,18 +251,17 @@ extern "C"
 	//---------------------------------------------------------------------------------
 	// Bitmap image container
 
+	size_t FFI(Image_Sizeof)() noexcept
+	{
+		return sizeof(DirectX::Image);
+	}
+
+	size_t FFI(ScratchImage_Sizeof)() noexcept
+	{
+		return sizeof(DirectX::ScratchImage);
+	}
+
 	// class ScratchImage {
-
-	DirectX::ScratchImage* FFI(ScratchImage_Ctor)() noexcept
-	{
-		return new (std::nothrow) DirectX::ScratchImage;
-	}
-
-	void FFI(ScratchImage_Dtor)(DirectX::ScratchImage* self) noexcept
-	{
-		assert(self != nullptr);
-		self->~ScratchImage();
-	}
 
 	HRESULT FFI(ScratchImage_Initialize)(
 		DirectX::ScratchImage* self,

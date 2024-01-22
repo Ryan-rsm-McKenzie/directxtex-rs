@@ -1,4 +1,4 @@
-use crate::{ffi, HResultError, ScratchImageFFI, TexMetadata, CP_FLAGS, DXGI_FORMAT};
+use crate::{ffi, HResultError, TexMetadata, CP_FLAGS, DXGI_FORMAT};
 use core::{
     ptr::{self, NonNull},
     slice,
@@ -31,31 +31,37 @@ impl Default for Image {
 }
 
 #[derive(Debug)]
-pub struct ScratchImage(NonNull<ScratchImageFFI>);
+#[repr(C)]
+pub struct ScratchImage {
+    m_nimages: usize,
+    m_size: usize,
+    m_metadata: TexMetadata,
+    m_image: *mut Image,
+    m_memory: *mut u8,
+}
 
 impl ScratchImage {
     #[must_use]
-    pub fn new() -> Option<Self> {
-        let this = unsafe { ffi::DirectXTexFFI_ScratchImage_Ctor() };
-        NonNull::new(this).map(Self)
+    pub fn new() -> Self {
+        Self::default()
     }
 }
 
-impl From<&ScratchImage> for ffi::ConstPtr<ScratchImageFFI> {
-    fn from(value: &ScratchImage) -> Self {
-        ffi::ConstPtr::new(value.0)
-    }
-}
-
-impl From<&mut ScratchImage> for ffi::MutPtr<ScratchImageFFI> {
-    fn from(value: &mut ScratchImage) -> Self {
-        ffi::MutPtr::new(value.0)
+impl Default for ScratchImage {
+    fn default() -> Self {
+        Self {
+            m_nimages: 0,
+            m_size: 0,
+            m_metadata: TexMetadata::default(),
+            m_image: ptr::null_mut(),
+            m_memory: ptr::null_mut(),
+        }
     }
 }
 
 impl Drop for ScratchImage {
     fn drop(&mut self) {
-        unsafe { ffi::DirectXTexFFI_ScratchImage_Dtor(self.into()) }
+        self.release();
     }
 }
 
@@ -269,5 +275,21 @@ impl ScratchImage {
     #[must_use]
     pub fn is_alpha_all_opaque(&self) -> bool {
         unsafe { ffi::DirectXTexFFI_ScratchImage_IsAlphaAllOpaque(self.into()) }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{ffi, Image, ScratchImage};
+    use core::mem;
+
+    #[test]
+    fn size_of() {
+        assert_eq!(mem::size_of::<Image>(), unsafe {
+            ffi::DirectXTexFFI_Image_Sizeof()
+        });
+        assert_eq!(mem::size_of::<ScratchImage>(), unsafe {
+            ffi::DirectXTexFFI_ScratchImage_Sizeof()
+        });
     }
 }

@@ -278,8 +278,19 @@ impl DDSMetaData {
 
 #[cfg(test)]
 mod tests {
-    use crate::{TexMetadata, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION};
+    use crate::{ffi, DDSMetaData, TexMetadata, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION};
+    use core::mem;
     use std::fs;
+
+    #[test]
+    fn size_of() {
+        assert_eq!(mem::size_of::<TexMetadata>(), unsafe {
+            ffi::DirectXTexFFI_TexMetadata_Sizeof()
+        });
+        assert_eq!(mem::size_of::<DDSMetaData>(), unsafe {
+            ffi::DirectXTexFFI_DDSMetaData_Sizeof()
+        });
+    }
 
     #[test]
     fn from_dds() {

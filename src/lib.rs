@@ -20,5 +20,3 @@ pub use self::{
 
 macros::c_opaque!(pub IWICImagingFactory);
 macros::c_opaque!(pub IWICMetadataQueryReader);
-
-macros::c_opaque!(pub(crate) ScratchImageFFI);
