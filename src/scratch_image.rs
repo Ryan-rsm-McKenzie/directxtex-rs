@@ -16,13 +16,6 @@ pub struct ScratchImage {
     m_memory: *mut u8,
 }
 
-impl ScratchImage {
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
 impl Default for ScratchImage {
     fn default() -> Self {
         Self {
@@ -256,16 +249,16 @@ impl ScratchImage {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ffi, Image, ScratchImage};
+    use crate::{ffi, ScratchImage};
     use core::mem;
 
     #[test]
-    fn size_of() {
-        assert_eq!(mem::size_of::<Image>(), unsafe {
-            ffi::DirectXTexFFI_Image_Sizeof()
-        });
+    fn verify_layout() {
         assert_eq!(mem::size_of::<ScratchImage>(), unsafe {
             ffi::DirectXTexFFI_ScratchImage_Sizeof()
+        });
+        assert_eq!(mem::align_of::<ScratchImage>(), unsafe {
+            ffi::DirectXTexFFI_ScratchImage_Alignof()
         });
     }
 }

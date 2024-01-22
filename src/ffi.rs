@@ -1,8 +1,8 @@
 use crate::{
-    DDSMetaData, HResult, Image, ScratchImage, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
+    Blob, DDSMetaData, HResult, Image, ScratchImage, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
     FORMAT_TYPE, TGA_FLAGS,
 };
-use core::ptr::NonNull;
+use core::{ffi::c_void, ptr::NonNull};
 
 #[repr(transparent)]
 pub(crate) struct ConstNonNull<T>(NonNull<T>);
@@ -75,9 +75,13 @@ extern "C" {
 
     #[cfg(test)]
     pub(crate) fn DirectXTexFFI_TexMetadata_Sizeof() -> usize;
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_TexMetadata_Alignof() -> usize;
 
     #[cfg(test)]
     pub(crate) fn DirectXTexFFI_DDSMetaData_Sizeof() -> usize;
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_DDSMetaData_Alignof() -> usize;
 
     pub(crate) fn DirectXTexFFI_TexMetadata_ComputIndex(
         this: ConstNonNull<TexMetadata>,
@@ -112,9 +116,13 @@ extern "C" {
 
     #[cfg(test)]
     pub(crate) fn DirectXTexFFI_Image_Sizeof() -> usize;
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_Image_Alignof() -> usize;
 
     #[cfg(test)]
     pub(crate) fn DirectXTexFFI_ScratchImage_Sizeof() -> usize;
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_ScratchImage_Alignof() -> usize;
 
     pub(crate) fn DirectXTexFFI_ScratchImage_Initialize(
         this: MutNonNull<ScratchImage>,

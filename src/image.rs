@@ -24,3 +24,19 @@ impl Default for Image {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{ffi, Image};
+    use core::mem;
+
+    #[test]
+    fn verify_layout() {
+        assert_eq!(mem::size_of::<Image>(), unsafe {
+            ffi::DirectXTexFFI_Image_Sizeof()
+        });
+        assert_eq!(mem::align_of::<Image>(), unsafe {
+            ffi::DirectXTexFFI_Image_Alignof()
+        });
+    }
+}

@@ -184,9 +184,19 @@ extern "C"
 		return sizeof(DirectX::TexMetadata);
 	}
 
+	size_t FFI(TexMetadata_Alignof)() noexcept
+	{
+		return alignof(DirectX::TexMetadata);
+	}
+
 	size_t FFI(DDSMetaData_Sizeof)() noexcept
 	{
 		return sizeof(DirectX::DDSMetaData);
+	}
+
+	size_t FFI(DDSMetaData_Alignof)() noexcept
+	{
+		return alignof(DirectX::DDSMetaData);
 	}
 
 	// struct TexMetadata {
@@ -256,9 +266,19 @@ extern "C"
 		return sizeof(DirectX::Image);
 	}
 
+	size_t FFI(Image_Alignof)() noexcept
+	{
+		return alignof(DirectX::Image);
+	}
+
 	size_t FFI(ScratchImage_Sizeof)() noexcept
 	{
 		return sizeof(DirectX::ScratchImage);
+	}
+
+	size_t FFI(ScratchImage_Alignof)() noexcept
+	{
+		return alignof(DirectX::ScratchImage);
 	}
 
 	// class ScratchImage {
