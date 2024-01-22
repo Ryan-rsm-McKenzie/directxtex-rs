@@ -2,6 +2,7 @@
 categories = ["api-bindings", "encoding", "multimedia::encoding", "multimedia::images", "rendering::data-formats"]
 description = "Unofficial Rust bindings for Microsoft's DirectXTex library"
 edition = "2021"
+homepage = "https://github.com/Ryan-rsm-McKenzie/directxtex-rs"
 include = [
   "external/DirectX-Headers/include/*",
   "external/DirectX-Headers/src/*",
