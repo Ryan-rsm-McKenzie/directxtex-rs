@@ -87,10 +87,12 @@ fn build_tex() {
 
 fn build_ffi() {
     let root = Path::new("ffi");
-    make_standard_build()
-        .file(root.join("main.cpp"))
-        .include(root)
-        .compile("directxtex-ffi");
+    let mut build = make_standard_build();
+    build.file(root.join("main.cpp")).include(root);
+    if cfg!(windows) {
+        build.define("CONFIG_WINDOWS", "1");
+    }
+    build.compile("directxtex-ffi");
 }
 
 fn main() {

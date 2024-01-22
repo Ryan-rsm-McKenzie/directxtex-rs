@@ -1,5 +1,11 @@
 use crate::macros;
 
+#[cfg(windows)]
+type Underlying = u32;
+
+#[cfg(not(windows))]
+type Underlying = u64;
+
 macros::c_enum! {
     FORMAT_TYPE(u32) => {
         FORMAT_TYPE_TYPELESS = 0,
@@ -12,7 +18,7 @@ macros::c_enum! {
 }
 
 macros::c_bits! {
-    CP_FLAGS(u32) => {
+    CP_FLAGS(Underlying) => {
         /// Assume pitch is DWORD aligned instead of BYTE aligned
         CP_FLAGS_LEGACY_DWORD = 0x1,
 
@@ -58,13 +64,13 @@ macros::c_enum! {
 
 macros::c_enum! {
     /// Subset here matches D3D10_RESOURCE_MISC_FLAG and D3D11_RESOURCE_MISC_FLAG
-    TEX_MISC_FLAG(u32) => {
+    TEX_MISC_FLAG(Underlying) => {
         TEX_MISC_TEXTURECUBE = 0x4,
     }
 }
 
 macros::c_enum! {
-    TEX_MISC_FLAG2(u32) => {
+    TEX_MISC_FLAG2(Underlying) => {
         TEX_MISC2_ALPHA_MODE_MASK = 0x7,
     }
 }
@@ -81,7 +87,7 @@ macros::c_enum! {
 }
 
 macros::c_bits! {
-    DDS_FLAGS(u32) => {
+    DDS_FLAGS(Underlying) => {
         /// Assume pitch is DWORD aligned instead of BYTE aligned (used by some legacy DDS files)
         DDS_FLAGS_LEGACY_DWORD = 0x1,
 
@@ -154,7 +160,7 @@ impl TGA_FLAGS {
 }
 
 macros::c_bits! {
-    TEX_FILTER_FLAGS(u32) => {
+    TEX_FILTER_FLAGS(Underlying) => {
         /// Wrap vs. Mirror vs. Clamp filtering options
         TEX_FILTER_WRAP_U = 0x1,
         /// Wrap vs. Mirror vs. Clamp filtering options
@@ -250,7 +256,7 @@ impl TEX_FILTER_FLAGS {
 }
 
 macros::c_bits! {
-    TEX_PMALPHA_FLAGS(u32) => {
+    TEX_PMALPHA_FLAGS(Underlying) => {
         /// ignores sRGB colorspace conversions
         TEX_PMALPHA_IGNORE_SRGB = 0x1,
 
@@ -274,7 +280,7 @@ impl TEX_PMALPHA_FLAGS {
 }
 
 macros::c_bits! {
-    TEX_COMPRESS_FLAGS(u32) => {
+    TEX_COMPRESS_FLAGS(Underlying) => {
         /// Enables dithering RGB colors for BC1-3 compression
         TEX_COMPRESS_RGB_DITHER = 0x10000,
 
@@ -314,7 +320,7 @@ impl TEX_COMPRESS_FLAGS {
 }
 
 macros::c_bits! {
-    CNMAP_FLAGS(u32) => {
+    CNMAP_FLAGS(Underlying) => {
         /// Channel selection when evaluting color value for height
         CNMAP_CHANNEL_RED = 0x1,
         /// Channel selection when evaluting color value for height
@@ -348,7 +354,7 @@ impl CNMAP_FLAGS {
 }
 
 macros::c_bits! {
-    CMSE_FLAGS(u32) => {
+    CMSE_FLAGS(Underlying) => {
         /// Indicates that image needs gamma correction before comparision
         CMSE_IMAGE1_SRGB = 0x1,
         /// Indicates that image needs gamma correction before comparision
@@ -372,4 +378,18 @@ macros::c_bits! {
 
 impl CMSE_FLAGS {
     pub const CMSE_DEFAULT: Self = Self::empty();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Underlying;
+    use crate::ffi;
+    use core::mem;
+
+    #[test]
+    fn verify_underlying() {
+        assert_eq!(mem::size_of::<Underlying>(), unsafe {
+            ffi::DirectXTexFFI_UnderlyingSize()
+        });
+    }
 }

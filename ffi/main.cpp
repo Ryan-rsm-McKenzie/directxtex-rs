@@ -14,19 +14,25 @@ static_assert(CHAR_BIT == 8);
 template <class T, size_t BYTES>
 static constexpr bool is_abi_compatible_v = sizeof(T) == BYTES && (std::is_integral_v<T> || std::is_enum_v<T>);
 
-static_assert(is_abi_compatible_v<DirectX::CMSE_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::CNMAP_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::CP_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::DDS_FLAGS, 4>);
+#if CONFIG_WINDOWS
+#	define UNDERLYING_SIZE 4
+#else
+#	define UNDERLYING_SIZE 8
+#endif
+
+static_assert(is_abi_compatible_v<DirectX::CMSE_FLAGS, UNDERLYING_SIZE>);
+static_assert(is_abi_compatible_v<DirectX::CNMAP_FLAGS, UNDERLYING_SIZE>);
+static_assert(is_abi_compatible_v<DirectX::CP_FLAGS, UNDERLYING_SIZE>);
+static_assert(is_abi_compatible_v<DirectX::DDS_FLAGS, UNDERLYING_SIZE>);
 static_assert(is_abi_compatible_v<DirectX::FORMAT_TYPE, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_ALPHA_MODE, 4>);
-static_assert(is_abi_compatible_v<DirectX::TEX_COMPRESS_FLAGS, 4>);
+static_assert(is_abi_compatible_v<DirectX::TEX_COMPRESS_FLAGS, UNDERLYING_SIZE>);
 static_assert(is_abi_compatible_v<DirectX::TEX_DIMENSION, 4>);
-static_assert(is_abi_compatible_v<DirectX::TEX_FILTER_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG, 4>);
-static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG2, 4>);
-static_assert(is_abi_compatible_v<DirectX::TEX_PMALPHA_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::TGA_FLAGS, 4>);
+static_assert(is_abi_compatible_v<DirectX::TEX_FILTER_FLAGS, UNDERLYING_SIZE>);
+static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG, UNDERLYING_SIZE>);
+static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG2, UNDERLYING_SIZE>);
+static_assert(is_abi_compatible_v<DirectX::TEX_PMALPHA_FLAGS, UNDERLYING_SIZE>);
+static_assert(is_abi_compatible_v<DirectX::TGA_FLAGS, UNDERLYING_SIZE>);
 static_assert(is_abi_compatible_v<DXGI_FORMAT, 4>);
 static_assert(is_abi_compatible_v<HRESULT, 4>);
 
@@ -36,6 +42,11 @@ extern "C"
 {
 	//---------------------------------------------------------------------------------
 	// DXGI Format Utilities
+
+	size_t FFI(UnderlyingSize)() noexcept
+	{
+		return UNDERLYING_SIZE;
+	}
 
 	bool FFI(IsPacked)(
 		DXGI_FORMAT fmt) noexcept

@@ -95,6 +95,9 @@ extern "C" {
     //---------------------------------------------------------------------------------
     // DXGI Format Utilities
 
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_UnderlyingSize() -> usize;
+
     pub(crate) fn DirectXTexFFI_IsPacked(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsVideo(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsPlanar(fmt: DXGI_FORMAT) -> bool;
