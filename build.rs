@@ -12,6 +12,8 @@ fn build_headers() {
     headers
         .cpp(true)
         .std("c++14")
+        .warnings(false)
+        .extra_warnings(false)
         .includes(
             ["include", "include/directx"]
                 .into_iter()
@@ -21,6 +23,8 @@ fn build_headers() {
     guids
         .cpp(true)
         .std("c++14")
+        .warnings(false)
+        .extra_warnings(false)
         .includes(
             ["include", "include/directx"]
                 .into_iter()
@@ -47,6 +51,8 @@ fn build_tex() {
     build
         .cpp(true)
         .std("c++17")
+        .warnings(false)
+        .extra_warnings(false)
         .files(
             [
                 "DirectXTex/BC.cpp",
