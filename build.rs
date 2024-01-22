@@ -104,6 +104,8 @@ fn build_ffi() {
     build
         .cpp(true)
         .std("c++17")
+        .warnings(false)
+        .extra_warnings(false)
         .file(root.join("main.cpp"))
         .include(root)
         .includes([
