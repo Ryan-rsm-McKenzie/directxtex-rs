@@ -27,10 +27,12 @@ impl Blob {
         unsafe { ffi::from_raw_ffi_parts_mut(self.m_buffer.cast(), self.m_size) }
     }
 
+    /// Reallocate for a new size
     pub fn resize(&mut self, size: usize) -> Result<()> {
         unsafe { ffi::DirectXTexFFI_Blob_Resize(self.into(), size) }.success()
     }
 
+    /// Shorten size without reallocation
     pub fn trim(&mut self, size: usize) -> Result<()> {
         unsafe { ffi::DirectXTexFFI_Blob_Trim(self.into(), size) }.success()
     }

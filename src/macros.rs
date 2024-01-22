@@ -1,20 +1,20 @@
 macro_rules! c_enum {
 	(
-		$(#[doc=$enumeration_doc:literal])?
+		$(#[doc=$enumeration_doc:literal])*
 		$enumeration:ident($underlying:ty) => {$(
-			$(#[doc=$variant_doc:literal])?
+			$(#[doc=$variant_doc:literal])*
 			$variant:ident = $value:literal,
 		)*}
 	) => {
 		#[allow(non_camel_case_types)]
 		#[derive(Clone, Copy, Eq, Hash, PartialEq, PartialOrd, Ord)]
 		#[repr(transparent)]
-		$(#[doc = $enumeration_doc])?
+		$(#[doc = $enumeration_doc])*
 		pub struct $enumeration($underlying);
 
 		impl $enumeration {
 			$(
-				$(#[doc = $variant_doc])?
+				$(#[doc = $variant_doc])*
 				pub const $variant: Self = Self($value);
 			)*
 
@@ -57,9 +57,9 @@ pub(crate) use c_enum;
 
 macro_rules! c_bits {
 	(
-		$(#[doc=$enumeration_doc:literal])?
+		$(#[doc=$enumeration_doc:literal])*
 		$enumeration:ident($underlying:ty) => {$(
-			$(#[doc=$variant_doc:literal])?
+			$(#[doc=$variant_doc:literal])*
 			$variant:ident = $value:literal,
 		)*}
 	) => {
@@ -67,10 +67,10 @@ macro_rules! c_bits {
 			#[allow(non_camel_case_types)]
 			#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
 			#[repr(transparent)]
-			$(#[doc = $enumeration_doc])?
+			$(#[doc = $enumeration_doc])*
 			pub struct $enumeration: $underlying {
 				$(
-					$(#[doc = $variant_doc])?
+					$(#[doc = $variant_doc])*
 					const $variant = $value;
 				)*
 				const _ = !0;

@@ -1,13 +1,21 @@
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[repr(C)]
 pub struct DDSMetaData {
+    /// DDPIXELFORMAT.dwSize
     pub size: u32,
+    /// DDPIXELFORMAT.dwFlags
     pub flags: u32,
+    /// DDPIXELFORMAT.dwFourCC
     pub four_cc: u32,
+    /// DDPIXELFORMAT.dwRGBBitCount/dwYUVBitCount/dwAlphaBitDepth/dwLuminanceBitCount/dwBumpBitCount
     pub rgb_bit_count: u32,
+    /// DDPIXELFORMAT.dwRBitMask/dwYBitMask/dwLuminanceBitMask/dwBumpDuBitMask
     pub r_bit_mask: u32,
+    /// DDPIXELFORMAT.dwGBitMask/dwUBitMask/dwBumpDvBitMask
     pub g_bit_mask: u32,
+    /// DDPIXELFORMAT.dwBBitMask/dwVBitMask/dwBumpLuminanceBitMask
     pub b_bit_mask: u32,
+    /// DDPIXELFORMAT.dwRGBAlphaBitMask/dwYUVAlphaBitMask/dwLuminanceAlphaBitMask
     pub a_bit_mask: u32,
 }
 
