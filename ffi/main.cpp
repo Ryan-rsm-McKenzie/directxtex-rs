@@ -14,23 +14,19 @@ static_assert(CHAR_BIT == 8);
 template <class T, size_t BYTES>
 static constexpr bool is_abi_compatible_v = sizeof(T) == BYTES && (std::is_integral_v<T> || std::is_enum_v<T>);
 
-static_assert(is_abi_compatible_v<DirectX::WICCodecs, 4>);
 static_assert(is_abi_compatible_v<DirectX::CMSE_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DirectX::CNMAP_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DirectX::CP_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::CREATETEX_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DirectX::DDS_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DirectX::FORMAT_TYPE, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_ALPHA_MODE, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_COMPRESS_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_DIMENSION, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_FILTER_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::TEX_FR_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_MISC_FLAG2, 4>);
 static_assert(is_abi_compatible_v<DirectX::TEX_PMALPHA_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DirectX::TGA_FLAGS, 4>);
-static_assert(is_abi_compatible_v<DirectX::WIC_FLAGS, 4>);
 static_assert(is_abi_compatible_v<DXGI_FORMAT, 4>);
 static_assert(is_abi_compatible_v<HRESULT, 4>);
 
@@ -773,10 +769,20 @@ extern "C"
 	//---------------------------------------------------------------------------------
 	// Misc image operations
 
+	size_t FFI(Rect_Sizeof)() noexcept
+	{
+		return sizeof(DirectX::Rect);
+	}
+
+	size_t FFI(Rect_Alignof)() noexcept
+	{
+		return alignof(DirectX::Rect);
+	}
+
 	HRESULT FFI(CopyRectangle)(
 		const DirectX::Image* srcImage,
 		const DirectX::Rect* srcRect,
-		const DirectX::Image* dstImage,
+		DirectX::Image* dstImage,
 		DirectX::TEX_FILTER_FLAGS filter,
 		size_t xOffset,
 		size_t yOffset) noexcept
@@ -800,79 +806,13 @@ extern "C"
 		return DirectX::ComputeMSE(*image1, *image2, *mse, mseV, flags);
 	}
 
-	HRESULT FFI(EvaluateImage1)(
-		const DirectX::Image* image,
-		void (*pixelFunc)(const DirectX::XMVECTOR*, size_t, size_t)) noexcept
-	{
-		assert(image != nullptr);
-		assert(pixelFunc != nullptr);
-		return DirectX::EvaluateImage(*image, pixelFunc);
-	}
-
-	HRESULT FFI(EvaluateImage2)(
-		const DirectX::Image* images,
-		size_t nimages,
-		const DirectX::TexMetadata* metadata,
-		void (*pixelFunc)(const DirectX::XMVECTOR*, size_t, size_t)) noexcept
-	{
-		assert(metadata != nullptr);
-		assert(pixelFunc != nullptr);
-		return DirectX::EvaluateImage(images, nimages, *metadata, pixelFunc);
-	}
-
-	HRESULT FFI(TransformImage1)(
-		const DirectX::Image* image,
-		void (*pixelFunc)(const DirectX::XMVECTOR*, const DirectX::XMVECTOR*, size_t, size_t),
-		DirectX::ScratchImage* result) noexcept
-	{
-		assert(image != nullptr);
-		assert(pixelFunc != nullptr);
-		assert(result != nullptr);
-		return DirectX::TransformImage(*image, pixelFunc, *result);
-	}
-
-	HRESULT FFI(TransformImage2)(
-		const DirectX::Image* srcImages,
-		size_t nimages,
-		const DirectX::TexMetadata* metadata,
-		void (*pixelFunc)(const DirectX::XMVECTOR*, const DirectX::XMVECTOR*, size_t, size_t),
-		DirectX::ScratchImage* result) noexcept
-	{
-		assert(metadata != nullptr);
-		assert(pixelFunc != nullptr);
-		assert(result != nullptr);
-		return DirectX::TransformImage(srcImages, nimages, *metadata, pixelFunc, *result);
-	}
-
-	//---------------------------------------------------------------------------------
-	// WIC utility code
-#ifdef _WIN32
-	const GUID* FFI(GetWICCodec)(
-		DirectX::WICCodecs codec) noexcept
-	{
-		return &DirectX::GetWICCodec(codec);
-	}
-
-	IWICImagingFactory* FFI(GetWICFactory)(
-		bool* iswic2) noexcept
-	{
-		assert(iswic2 != nullptr);
-		return DirectX::GetWICFactory(*iswic2);
-	}
-
-	void FFI(SetWICFactory)(
-		IWICImagingFactory* pWIC) noexcept
-	{
-		return DirectX::SetWICFactory(pWIC);
-	}
-#endif
-
 	//---------------------------------------------------------------------------------
 	// DDS helper functions
+
 	HRESULT FFI(EncodeDDSHeader)(
 		const DirectX::TexMetadata* metadata,
 		DirectX::DDS_FLAGS flags,
-		void* pDestination,
+		uint8_t* pDestination,
 		size_t maxsize,
 		size_t* required) noexcept
 	{

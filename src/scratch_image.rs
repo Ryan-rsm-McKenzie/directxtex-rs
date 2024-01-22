@@ -1,6 +1,6 @@
 use crate::{
     ffi::{self, prelude::*},
-    Blob, DDSMetaData, Image, Result, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
+    Blob, DDSMetaData, Image, Result, TexMetadata, CNMAP_FLAGS, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
     TEX_COMPRESS_FLAGS, TEX_FILTER_FLAGS, TEX_PMALPHA_FLAGS, TGA_FLAGS,
 };
 use core::ptr;
@@ -495,6 +495,29 @@ impl ScratchImage {
                 images.as_ffi_ptr(),
                 images.len(),
                 metadata.into(),
+                format,
+                (&mut result).into(),
+            )
+        };
+        hr.success(result)
+    }
+
+    pub fn compute_normal_map(
+        &self,
+        metadata: &TexMetadata,
+        flags: CNMAP_FLAGS,
+        amplitude: f32,
+        format: DXGI_FORMAT,
+    ) -> Result<Self> {
+        let mut result = Self::default();
+        let images = self.images();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_ComputeNormalMap2(
+                images.as_ffi_ptr(),
+                images.len(),
+                metadata.into(),
+                flags,
+                amplitude,
                 format,
                 (&mut result).into(),
             )

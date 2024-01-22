@@ -154,65 +154,6 @@ impl TGA_FLAGS {
 }
 
 macros::c_bits! {
-    WIC_FLAGS(u32) => {
-        /// Loads DXGI 1.1 BGR formats as DXGI_FORMAT_R8G8B8A8_UNORM to avoid use of optional WDDM 1.1 formats
-        WIC_FLAGS_FORCE_RGB = 0x1,
-
-        /// Loads DXGI 1.1 X2 10:10:10:2 format as DXGI_FORMAT_R10G10B10A2_UNORM
-        WIC_FLAGS_NO_X2_BIAS = 0x2,
-
-        /// Loads 565, 5551, and 4444 formats as 8888 to avoid use of optional WDDM 1.2 formats
-        WIC_FLAGS_NO_16BPP = 0x4,
-
-        /// Loads 1-bit monochrome (black & white) as R1_UNORM rather than 8-bit grayscale
-        WIC_FLAGS_ALLOW_MONO = 0x8,
-
-        /// Loads all images in a multi-frame file, converting/resizing to match the first frame as needed, defaults to 0th frame otherwise
-        WIC_FLAGS_ALL_FRAMES = 0x10,
-
-        /// Ignores sRGB metadata if present in the file
-        WIC_FLAGS_IGNORE_SRGB = 0x20,
-
-        /// Writes sRGB metadata into the file reguardless of format
-        WIC_FLAGS_FORCE_SRGB = 0x40,
-
-        /// Writes linear gamma metadata into the file reguardless of format
-        WIC_FLAGS_FORCE_LINEAR = 0x80,
-
-        /// If no colorspace is specified, assume sRGB
-        WIC_FLAGS_DEFAULT_SRGB = 0x100,
-
-        /// Use ordered 4x4 dithering for any required conversions
-        WIC_FLAGS_DITHER = 0x10000,
-
-        /// Use error-diffusion dithering for any required conversions
-        WIC_FLAGS_DITHER_DIFFUSION = 0x20000,
-
-        /// Filtering mode to use for any required image resizing (only needed when loading arrays of differently sized images; defaults to Fant)
-        WIC_FLAGS_FILTER_POINT = 0x100000,
-        /// Filtering mode to use for any required image resizing (only needed when loading arrays of differently sized images; defaults to Fant)
-        WIC_FLAGS_FILTER_LINEAR = 0x200000,
-        /// Filtering mode to use for any required image resizing (only needed when loading arrays of differently sized images; defaults to Fant)
-        WIC_FLAGS_FILTER_CUBIC = 0x300000,
-        /// Filtering mode to use for any required image resizing (only needed when loading arrays of differently sized images; defaults to Fant)
-        ///
-        /// Combination of Linear and Box filter
-        WIC_FLAGS_FILTER_FANT = 0x400000,
-    }
-}
-
-macros::c_bits! {
-    TEX_FR_FLAGS(u32) => {
-        TEX_FR_ROTATE0 = 0x0,
-        TEX_FR_ROTATE90 = 0x1,
-        TEX_FR_ROTATE180 = 0x2,
-        TEX_FR_ROTATE270 = 0x3,
-        TEX_FR_FLIP_HORIZONTAL = 0x08,
-        TEX_FR_FLIP_VERTICAL = 0x10,
-    }
-}
-
-macros::c_bits! {
     TEX_FILTER_FLAGS(u32) => {
         /// Wrap vs. Mirror vs. Clamp filtering options
         TEX_FILTER_WRAP_U = 0x1,
@@ -431,36 +372,4 @@ macros::c_bits! {
 
 impl CMSE_FLAGS {
     pub const CMSE_DEFAULT: Self = Self::empty();
-}
-
-macros::c_enum! {
-    WICCodecs(u32) => {
-        /// Windows Bitmap (.bmp)
-        WIC_CODEC_BMP = 1,
-        /// Joint Photographic Experts Group (.jpg, .jpeg)
-        WIC_CODEC_JPEG = 2,
-        /// Portable Network Graphics (.png)
-        WIC_CODEC_PNG = 3,
-        /// Tagged Image File Format  (.tif, .tiff)
-        WIC_CODEC_TIFF = 4,
-        /// Graphics Interchange Format  (.gif)
-        WIC_CODEC_GIF = 5,
-        /// Windows Media Photo / HD Photo / JPEG XR (.hdp, .jxr, .wdp)
-        WIC_CODEC_WMP = 6,
-        /// Windows Icon (.ico)
-        WIC_CODEC_ICO = 7,
-        /// High Efficiency Image File (.heif, .heic)
-        WIC_CODEC_HEIF = 8,
-    }
-}
-
-macros::c_bits! {
-    CREATETEX_FLAGS(u32) => {
-        CREATETEX_FORCE_SRGB = 0x1,
-        CREATETEX_IGNORE_SRGB = 0x2,
-    }
-}
-
-impl CREATETEX_FLAGS {
-    pub const CREATETEX_DEFAULT: Self = Self::empty();
 }

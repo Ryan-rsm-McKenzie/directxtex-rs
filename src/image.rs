@@ -1,9 +1,15 @@
 use crate::{
     ffi::{self, prelude::*},
-    Blob, Result, ScratchImage, TexMetadata, DDS_FLAGS, DXGI_FORMAT, TEX_COMPRESS_FLAGS,
-    TEX_FILTER_FLAGS, TEX_PMALPHA_FLAGS, TGA_FLAGS,
+    Blob, Rect, Result, ScratchImage, TexMetadata, CMSE_FLAGS, CNMAP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
+    TEX_COMPRESS_FLAGS, TEX_FILTER_FLAGS, TEX_PMALPHA_FLAGS, TGA_FLAGS,
 };
 use core::ptr;
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct MeanSquaredError {
+    value: f32,
+    vector: [f32; 4],
+}
 
 #[derive(Debug)]
 #[repr(C)]
@@ -143,6 +149,60 @@ impl Image {
         let mut result = ScratchImage::default();
         let hr =
             unsafe { ffi::DirectXTexFFI_Decompress1(self.into(), format, (&mut result).into()) };
+        hr.success(result)
+    }
+
+    pub fn compute_normal_map(
+        &self,
+        flags: CNMAP_FLAGS,
+        amplitude: f32,
+        format: DXGI_FORMAT,
+    ) -> Result<ScratchImage> {
+        let mut result = ScratchImage::default();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_ComputeNormalMap1(
+                self.into(),
+                flags,
+                amplitude,
+                format,
+                (&mut result).into(),
+            )
+        };
+        hr.success(result)
+    }
+
+    pub fn copy_rectangle(
+        &mut self,
+        image: &Image,
+        rect: &Rect,
+        filter: TEX_FILTER_FLAGS,
+        x_offset: usize,
+        y_offset: usize,
+    ) -> Result<()> {
+        let hr = unsafe {
+            ffi::DirectXTexFFI_CopyRectangle(
+                image.into(),
+                rect.into(),
+                self.into(),
+                filter,
+                x_offset,
+                y_offset,
+            )
+        };
+        hr.success(())
+    }
+
+    pub fn compute_mse(&self, other: &Self, flags: CMSE_FLAGS) -> Result<MeanSquaredError> {
+        let mut result = MeanSquaredError::default();
+        let hr = unsafe {
+            ffi::DirectXTexFFI_ComputeMSE(
+                self.into(),
+                other.into(),
+                (&mut result.value).into(),
+                result.vector.as_mut_ffi_ptr(),
+                flags,
+            )
+        };
         hr.success(result)
     }
 }

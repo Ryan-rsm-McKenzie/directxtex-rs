@@ -1,6 +1,7 @@
 use crate::{
-    Blob, DDSMetaData, HResult, Image, ScratchImage, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
-    FORMAT_TYPE, TEX_COMPRESS_FLAGS, TEX_FILTER_FLAGS, TEX_PMALPHA_FLAGS, TGA_FLAGS,
+    Blob, DDSMetaData, HResult, Image, Rect, ScratchImage, TexMetadata, CMSE_FLAGS, CNMAP_FLAGS,
+    CP_FLAGS, DDS_FLAGS, DXGI_FORMAT, FORMAT_TYPE, TEX_COMPRESS_FLAGS, TEX_FILTER_FLAGS,
+    TEX_PMALPHA_FLAGS, TGA_FLAGS,
 };
 use core::{
     ptr::{self, NonNull},
@@ -14,6 +15,7 @@ pub(crate) mod prelude {
 
 pub(crate) trait SliceExt<T> {
     fn as_ffi_ptr(&self) -> *const T;
+    fn as_mut_ffi_ptr(&mut self) -> *mut T;
 }
 
 impl<T> SliceExt<T> for [T] {
@@ -22,6 +24,14 @@ impl<T> SliceExt<T> for [T] {
             ptr::null()
         } else {
             self.as_ptr()
+        }
+    }
+
+    fn as_mut_ffi_ptr(&mut self) -> *mut T {
+        if self.is_empty() {
+            ptr::null_mut()
+        } else {
+            self.as_mut_ptr()
         }
     }
 }
@@ -455,5 +465,61 @@ extern "C" {
         metadata: ConstNonNull<TexMetadata>,
         format: DXGI_FORMAT,
         images: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    //---------------------------------------------------------------------------------
+    // Normal map operations
+
+    pub(crate) fn DirectXTexFFI_ComputeNormalMap1(
+        srcImage: ConstNonNull<Image>,
+        flags: CNMAP_FLAGS,
+        amplitude: f32,
+        format: DXGI_FORMAT,
+        normalMap: MutNonNull<ScratchImage>,
+    ) -> HResult;
+    pub(crate) fn DirectXTexFFI_ComputeNormalMap2(
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        flags: CNMAP_FLAGS,
+        amplitude: f32,
+        format: DXGI_FORMAT,
+        normalMaps: MutNonNull<ScratchImage>,
+    ) -> HResult;
+
+    //---------------------------------------------------------------------------------
+    // Misc image operations
+
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_Rect_Sizeof() -> usize;
+    #[cfg(test)]
+    pub(crate) fn DirectXTexFFI_Rect_Alignof() -> usize;
+
+    pub(crate) fn DirectXTexFFI_CopyRectangle(
+        srcImage: ConstNonNull<Image>,
+        srcRect: ConstNonNull<Rect>,
+        dstImage: MutNonNull<Image>,
+        filter: TEX_FILTER_FLAGS,
+        xOffset: usize,
+        yOffset: usize,
+    ) -> HResult;
+
+    pub(crate) fn DirectXTexFFI_ComputeMSE(
+        image1: ConstNonNull<Image>,
+        image2: ConstNonNull<Image>,
+        mse: MutNonNull<f32>,
+        mseV: *mut f32,
+        flags: CMSE_FLAGS,
+    ) -> HResult;
+
+    //---------------------------------------------------------------------------------
+    // DDS helper functions
+
+    pub(crate) fn DirectXTexFFI_EncodeDDSHeader(
+        metadata: ConstNonNull<TexMetadata>,
+        flags: DDS_FLAGS,
+        pDestination: *mut u8,
+        maxsize: usize,
+        required: MutNonNull<usize>,
     ) -> HResult;
 }

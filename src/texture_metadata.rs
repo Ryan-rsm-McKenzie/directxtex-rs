@@ -3,6 +3,7 @@ use crate::{
     DDSMetaData, Result, DDS_FLAGS, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION, TEX_MISC_FLAG,
     TEX_MISC_FLAG2, TGA_FLAGS,
 };
+use core::ptr;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[repr(C)]
@@ -102,6 +103,33 @@ impl TexMetadata {
             )
         };
         hr.success(result)
+    }
+
+    pub fn encode_dds_header(&self, flags: DDS_FLAGS) -> Result<Box<[u8]>> {
+        let mut required = 0;
+        let hr = unsafe {
+            ffi::DirectXTexFFI_EncodeDDSHeader(
+                self.into(),
+                flags,
+                ptr::null_mut(),
+                0,
+                (&mut required).into(),
+            )
+        };
+        hr.success(())?;
+
+        let mut v = Vec::new();
+        v.resize_with(required, Default::default);
+        let hr = unsafe {
+            ffi::DirectXTexFFI_EncodeDDSHeader(
+                self.into(),
+                flags,
+                v.as_mut_ffi_ptr(),
+                v.len(),
+                (&mut required).into(),
+            )
+        };
+        hr.success(()).map(|()| v.into_boxed_slice())
     }
 }
 
