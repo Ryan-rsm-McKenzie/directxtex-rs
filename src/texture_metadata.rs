@@ -34,26 +34,27 @@ impl TexMetadata {
     #[must_use]
     /// Helper for [`misc_flags`](Self::misc_flags)
     pub fn is_cubemap(&self) -> bool {
-        (self.misc_flags & TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE.bits()) != 0
+        (self.misc_flags & TEX_MISC_FLAG::TEX_MISC_TEXTURECUBE.bits_fixed()) != 0
     }
 
     #[must_use]
     /// Helpers for [`misc_flags2`](Self::misc_flags2)
     pub fn is_pm_alpha(&self) -> bool {
-        (self.misc_flags2 & TEX_MISC_FLAG2::TEX_MISC2_ALPHA_MODE_MASK.bits())
+        (self.misc_flags2 & TEX_MISC_FLAG2::TEX_MISC2_ALPHA_MODE_MASK.bits_fixed())
             == TEX_ALPHA_MODE::TEX_ALPHA_MODE_PREMULTIPLIED.into()
     }
 
     /// Helpers for [`misc_flags2`](Self::misc_flags2)
     pub fn set_alpha_mode(&mut self, mode: TEX_ALPHA_MODE) {
-        self.misc_flags2 =
-            (self.misc_flags2 & !TEX_MISC_FLAG2::TEX_MISC2_ALPHA_MODE_MASK.bits()) | mode.bits();
+        self.misc_flags2 = (self.misc_flags2
+            & !TEX_MISC_FLAG2::TEX_MISC2_ALPHA_MODE_MASK.bits_fixed())
+            | mode.bits();
     }
 
     #[must_use]
     /// Helpers for [`misc_flags2`](Self::misc_flags2)
     pub fn get_alpha_mode(&self) -> TEX_ALPHA_MODE {
-        (self.misc_flags2 & TEX_MISC_FLAG2::TEX_MISC2_ALPHA_MODE_MASK.bits()).into()
+        (self.misc_flags2 & TEX_MISC_FLAG2::TEX_MISC2_ALPHA_MODE_MASK.bits_fixed()).into()
     }
 
     #[must_use]

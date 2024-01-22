@@ -19,8 +19,14 @@ macro_rules! c_enum {
 			)*
 
 			#[must_use]
-			pub const fn bits(&self) -> $underlying {
+			pub const fn bits(self) -> $underlying {
 				self.0
+			}
+
+			#[allow(unused)]
+			#[must_use]
+			pub(crate) const fn bits_fixed(self) -> u32 {
+				self.bits() as u32
 			}
 		}
 
@@ -74,6 +80,14 @@ macro_rules! c_bits {
 					const $variant = $value;
 				)*
 				const _ = !0;
+			}
+		}
+
+		impl $enumeration {
+			#[allow(unused)]
+			#[must_use]
+			pub(crate) fn bits_fixed(self) -> u32 {
+				self.bits() as u32
 			}
 		}
 	};

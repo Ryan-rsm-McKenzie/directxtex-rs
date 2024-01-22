@@ -1,10 +1,6 @@
 use crate::macros;
 
-#[cfg(windows)]
-type Underlying = u32;
-
-#[cfg(not(windows))]
-type Underlying = u64;
+type Underlying = core::ffi::c_ulong;
 
 macros::c_enum! {
     FORMAT_TYPE(u32) => {
