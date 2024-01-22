@@ -31,18 +31,6 @@ extern "C"
 	//---------------------------------------------------------------------------------
 	// DXGI Format Utilities
 
-	bool FFI(IsValid)(
-		DXGI_FORMAT fmt) noexcept
-	{
-		return DirectX::IsValid(fmt);
-	}
-
-	bool FFI(IsCompressed)(
-		DXGI_FORMAT fmt) noexcept
-	{
-		return DirectX::IsCompressed(fmt);
-	}
-
 	bool FFI(IsPacked)(
 		DXGI_FORMAT fmt) noexcept
 	{
@@ -61,22 +49,10 @@ extern "C"
 		return DirectX::IsPlanar(fmt);
 	}
 
-	bool FFI(IsPalettized)(
-		DXGI_FORMAT fmt) noexcept
-	{
-		return DirectX::IsPalettized(fmt);
-	}
-
 	bool FFI(IsDepthStencil)(
 		DXGI_FORMAT fmt) noexcept
 	{
 		return DirectX::IsDepthStencil(fmt);
-	}
-
-	bool FFI(IsSRGB)(
-		DXGI_FORMAT fmt) noexcept
-	{
-		return DirectX::IsSRGB(fmt);
 	}
 
 	bool FFI(IsBGR)(
@@ -401,13 +377,6 @@ extern "C"
 		return self->OverrideFormat(f);
 	}
 
-	const DirectX::TexMetadata* FFI(ScratchImage_GetMetadata)(
-		const DirectX::ScratchImage* self) noexcept
-	{
-		assert(self != nullptr);
-		return &self->GetMetadata();
-	}
-
 	const DirectX::Image* FFI(ScratchImage_GetImage)(
 		const DirectX::ScratchImage* self,
 		size_t mip,
@@ -416,34 +385,6 @@ extern "C"
 	{
 		assert(self != nullptr);
 		return self->GetImage(mip, item, slice);
-	}
-
-	const DirectX::Image* FFI(ScratchImage_GetImages)(
-		const DirectX::ScratchImage* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->GetImages();
-	}
-
-	size_t FFI(ScratchImage_GetImageCount)(
-		const DirectX::ScratchImage* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->GetImageCount();
-	}
-
-	uint8_t* FFI(ScratchImage_GetPixels)(
-		const DirectX::ScratchImage* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->GetPixels();
-	}
-
-	size_t FFI(ScratchImage_GetPixelsSize)(
-		const DirectX::ScratchImage* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->GetPixelsSize();
 	}
 
 	bool FFI(ScratchImage_IsAlphaAllOpaque)(
@@ -483,20 +424,6 @@ extern "C"
 	{
 		assert(self != nullptr);
 		return self->Release();
-	}
-
-	void* FFI(Blob_GetBufferPointer)(
-		const DirectX::Blob* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->GetBufferPointer();
-	}
-
-	size_t FFI(Blob_GetBufferSize)(
-		const DirectX::Blob* self) noexcept
-	{
-		assert(self != nullptr);
-		return self->GetBufferSize();
 	}
 
 	HRESULT FFI(Blob_Resize)(

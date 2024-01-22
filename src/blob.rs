@@ -25,9 +25,8 @@ impl Blob {
 
     #[must_use]
     fn do_get_buffer(&self) -> (NonNull<u8>, usize) {
-        let len = unsafe { ffi::DirectXTexFFI_Blob_GetBufferSize(self.into()) };
-        let ptr = unsafe { ffi::DirectXTexFFI_Blob_GetBufferPointer(self.into()) };
-        let ptr = NonNull::new(ptr.cast::<u8>()).unwrap_or(NonNull::dangling());
+        let len = self.m_size;
+        let ptr = NonNull::new(self.m_buffer.cast::<u8>()).unwrap_or(NonNull::dangling());
         (ptr, len)
     }
 

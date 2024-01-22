@@ -202,8 +202,7 @@ impl ScratchImage {
 
     #[must_use]
     pub fn get_metadata(&self) -> &TexMetadata {
-        let result = unsafe { ffi::DirectXTexFFI_ScratchImage_GetMetadata(self.into()) };
-        unsafe { result.as_ref() }
+        &self.m_metadata
     }
 
     #[must_use]
@@ -215,17 +214,15 @@ impl ScratchImage {
 
     #[must_use]
     pub fn get_images(&self) -> &[Image] {
-        let len = unsafe { ffi::DirectXTexFFI_ScratchImage_GetImageCount(self.into()) };
-        let ptr = unsafe { ffi::DirectXTexFFI_ScratchImage_GetImages(self.into()) };
-        let ptr = NonNull::new(ptr.cast_mut()).unwrap_or(NonNull::dangling());
+        let len = self.m_nimages;
+        let ptr = NonNull::new(self.m_image).unwrap_or(NonNull::dangling());
         unsafe { slice::from_raw_parts(ptr.as_ptr(), len) }
     }
 
     #[must_use]
     pub fn do_get_pixels(&self) -> (NonNull<u8>, usize) {
-        let len = unsafe { ffi::DirectXTexFFI_ScratchImage_GetPixelsSize(self.into()) };
-        let ptr = unsafe { ffi::DirectXTexFFI_ScratchImage_GetPixels(self.into()) };
-        let ptr = NonNull::new(ptr).unwrap_or(NonNull::dangling());
+        let len = self.m_size;
+        let ptr = NonNull::new(self.m_memory).unwrap_or(NonNull::dangling());
         (ptr, len)
     }
 

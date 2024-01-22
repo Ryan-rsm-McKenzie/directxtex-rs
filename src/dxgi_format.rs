@@ -156,12 +156,35 @@ impl DXGI_FORMAT {
 impl DXGI_FORMAT {
     #[must_use]
     pub fn is_valid(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsValid(self) }
+        (1..=191).contains(&self.bits())
     }
 
     #[must_use]
     pub fn is_compressed(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsCompressed(self) }
+        matches!(
+            self,
+            Self::DXGI_FORMAT_BC1_TYPELESS
+                | Self::DXGI_FORMAT_BC1_UNORM
+                | Self::DXGI_FORMAT_BC1_UNORM_SRGB
+                | Self::DXGI_FORMAT_BC2_TYPELESS
+                | Self::DXGI_FORMAT_BC2_UNORM
+                | Self::DXGI_FORMAT_BC2_UNORM_SRGB
+                | Self::DXGI_FORMAT_BC3_TYPELESS
+                | Self::DXGI_FORMAT_BC3_UNORM
+                | Self::DXGI_FORMAT_BC3_UNORM_SRGB
+                | Self::DXGI_FORMAT_BC4_TYPELESS
+                | Self::DXGI_FORMAT_BC4_UNORM
+                | Self::DXGI_FORMAT_BC4_SNORM
+                | Self::DXGI_FORMAT_BC5_TYPELESS
+                | Self::DXGI_FORMAT_BC5_UNORM
+                | Self::DXGI_FORMAT_BC5_SNORM
+                | Self::DXGI_FORMAT_BC6H_TYPELESS
+                | Self::DXGI_FORMAT_BC6H_UF16
+                | Self::DXGI_FORMAT_BC6H_SF16
+                | Self::DXGI_FORMAT_BC7_TYPELESS
+                | Self::DXGI_FORMAT_BC7_UNORM
+                | Self::DXGI_FORMAT_BC7_UNORM_SRGB
+        )
     }
 
     #[must_use]
@@ -181,7 +204,13 @@ impl DXGI_FORMAT {
 
     #[must_use]
     pub fn is_palettized(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsPalettized(self) }
+        matches!(
+            self,
+            Self::DXGI_FORMAT_AI44
+                | Self::DXGI_FORMAT_IA44
+                | Self::DXGI_FORMAT_P8
+                | Self::DXGI_FORMAT_A8P8
+        )
     }
 
     #[must_use]
@@ -191,7 +220,16 @@ impl DXGI_FORMAT {
 
     #[must_use]
     pub fn is_srgb(self) -> bool {
-        unsafe { ffi::DirectXTexFFI_IsSRGB(self) }
+        matches!(
+            self,
+            Self::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+                | Self::DXGI_FORMAT_BC1_UNORM_SRGB
+                | Self::DXGI_FORMAT_BC2_UNORM_SRGB
+                | Self::DXGI_FORMAT_BC3_UNORM_SRGB
+                | Self::DXGI_FORMAT_B8G8R8A8_UNORM_SRGB
+                | Self::DXGI_FORMAT_B8G8R8X8_UNORM_SRGB
+                | Self::DXGI_FORMAT_BC7_UNORM_SRGB
+        )
     }
 
     #[must_use]

@@ -2,16 +2,10 @@ use crate::{
     Blob, DDSMetaData, HResult, Image, ScratchImage, TexMetadata, CP_FLAGS, DDS_FLAGS, DXGI_FORMAT,
     FORMAT_TYPE, TGA_FLAGS,
 };
-use core::{ffi::c_void, ptr::NonNull};
+use core::ptr::NonNull;
 
 #[repr(transparent)]
 pub(crate) struct ConstNonNull<T>(NonNull<T>);
-
-impl<T> ConstNonNull<T> {
-    pub(crate) unsafe fn as_ref<'a>(&self) -> &'a T {
-        self.0.as_ref()
-    }
-}
 
 impl<T> From<&T> for ConstNonNull<T> {
     fn from(value: &T) -> Self {
@@ -34,14 +28,10 @@ extern "C" {
     //---------------------------------------------------------------------------------
     // DXGI Format Utilities
 
-    pub(crate) fn DirectXTexFFI_IsValid(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsCompressed(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsPacked(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsVideo(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsPlanar(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsPalettized(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsDepthStencil(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsSRGB(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsBGR(fmt: DXGI_FORMAT) -> bool;
     pub(crate) fn DirectXTexFFI_IsTypeless(fmt: DXGI_FORMAT, partialTypeless: bool) -> bool;
 
@@ -199,28 +189,12 @@ extern "C" {
         f: DXGI_FORMAT,
     ) -> bool;
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_GetMetadata(
-        this: ConstNonNull<ScratchImage>,
-    ) -> ConstNonNull<TexMetadata>;
     pub(crate) fn DirectXTexFFI_ScratchImage_GetImage(
         this: ConstNonNull<ScratchImage>,
         mip: usize,
         item: usize,
         slice: usize,
     ) -> *const Image;
-
-    pub(crate) fn DirectXTexFFI_ScratchImage_GetImages(
-        this: ConstNonNull<ScratchImage>,
-    ) -> *const Image;
-    pub(crate) fn DirectXTexFFI_ScratchImage_GetImageCount(
-        this: ConstNonNull<ScratchImage>,
-    ) -> usize;
-
-    pub(crate) fn DirectXTexFFI_ScratchImage_GetPixels(this: ConstNonNull<ScratchImage>)
-        -> *mut u8;
-    pub(crate) fn DirectXTexFFI_ScratchImage_GetPixelsSize(
-        this: ConstNonNull<ScratchImage>,
-    ) -> usize;
 
     pub(crate) fn DirectXTexFFI_ScratchImage_IsAlphaAllOpaque(
         this: ConstNonNull<ScratchImage>,
@@ -236,8 +210,6 @@ extern "C" {
 
     pub(crate) fn DirectXTexFFI_Blob_Initialize(this: MutNonNull<Blob>, size: usize) -> HResult;
     pub(crate) fn DirectXTexFFI_Blob_Release(this: MutNonNull<Blob>);
-    pub(crate) fn DirectXTexFFI_Blob_GetBufferPointer(this: ConstNonNull<Blob>) -> *mut c_void;
-    pub(crate) fn DirectXTexFFI_Blob_GetBufferSize(this: ConstNonNull<Blob>) -> usize;
     pub(crate) fn DirectXTexFFI_Blob_Resize(this: MutNonNull<Blob>, size: usize) -> HResult;
     pub(crate) fn DirectXTexFFI_Blob_Trim(this: MutNonNull<Blob>, size: usize) -> HResult;
 }
