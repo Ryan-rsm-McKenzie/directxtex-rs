@@ -1,7 +1,5 @@
 #include <cassert>
 #include <climits>
-#include <functional>
-#include <new>
 #include <stdint.h>
 #include <type_traits>
 
