@@ -19,7 +19,7 @@ macro_rules! c_enum {
 			)*
 
 			#[must_use]
-			pub fn bits(&self) -> $underlying {
+			pub const fn bits(&self) -> $underlying {
 				self.0
 			}
 		}
