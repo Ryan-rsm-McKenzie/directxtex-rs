@@ -1,6 +1,6 @@
 # DirectXTex Rust Bindings
 
-These are unofficial Rust bindings for the DirectXTex texture processing library. A C++17 compliant compiler is required to build this library. This library is verified to work on Windows, Linux, and MacOS. The library docs contain a migration table that describes the equivalency between the original C++ API and its Rust binding. What follows is the readme for the underlying DirectXTex library:
+These are unofficial Rust bindings for the DirectXTex texture processing library. A C++17 compliant compiler is required to build this library. This library is verified to work on Windows, Linux, and MacOS. The library docs contain a migration table that describes the equivalency between the original C++ API and its Rust bindings. What follows is the readme for the underlying DirectXTex library:
 
 #
 
