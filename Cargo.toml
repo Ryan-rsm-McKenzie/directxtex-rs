@@ -1,4 +1,5 @@
 [package]
+authors = ["Ryan McKenzie"]
 categories = ["api-bindings", "encoding", "multimedia::encoding", "multimedia::images", "rendering::data-formats"]
 description = "Unofficial Rust bindings for Microsoft's DirectXTex library"
 edition = "2021"
