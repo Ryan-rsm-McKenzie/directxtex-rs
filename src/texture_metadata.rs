@@ -211,4 +211,13 @@ mod tests {
         assert_eq!(tex.dimension, TEX_DIMENSION::TEX_DIMENSION_TEXTURE2D);
         assert_eq!(tex.get_alpha_mode(), TEX_ALPHA_MODE::TEX_ALPHA_MODE_UNKNOWN);
     }
+
+    #[test]
+    fn encode_dds_header() {
+        let file = fs::read("data/ferris_wheel.dds").unwrap();
+        let tex = TexMetadata::from_dds(&file, Default::default(), None).unwrap();
+        let header = tex.encode_dds_header(Default::default()).unwrap();
+        let len = header.len();
+        assert_eq!(&header[..], &file[..len]);
+    }
 }
