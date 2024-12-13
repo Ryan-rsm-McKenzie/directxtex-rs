@@ -91,26 +91,26 @@ impl<T> From<&mut T> for MutNonNull<T> {
 
 #[allow(non_snake_case)]
 #[link(name = "directxtex-ffi")]
-extern "C" {
+unsafe extern "C" {
     //---------------------------------------------------------------------------------
     // DXGI Format Utilities
 
-    pub(crate) fn DirectXTexFFI_IsPacked(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsVideo(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsPlanar(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsDepthStencil(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsBGR(fmt: DXGI_FORMAT) -> bool;
-    pub(crate) fn DirectXTexFFI_IsTypeless(fmt: DXGI_FORMAT, partialTypeless: bool) -> bool;
+    pub(crate) unsafe fn DirectXTexFFI_IsPacked(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) unsafe fn DirectXTexFFI_IsVideo(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) unsafe fn DirectXTexFFI_IsPlanar(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) unsafe fn DirectXTexFFI_IsDepthStencil(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) unsafe fn DirectXTexFFI_IsBGR(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) unsafe fn DirectXTexFFI_IsTypeless(fmt: DXGI_FORMAT, partialTypeless: bool) -> bool;
 
-    pub(crate) fn DirectXTexFFI_HasAlpha(fmt: DXGI_FORMAT) -> bool;
+    pub(crate) unsafe fn DirectXTexFFI_HasAlpha(fmt: DXGI_FORMAT) -> bool;
 
-    pub(crate) fn DirectXTexFFI_BitsPerPixel(fmt: DXGI_FORMAT) -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_BitsPerPixel(fmt: DXGI_FORMAT) -> usize;
 
-    pub(crate) fn DirectXTexFFI_BitsPerColor(fmt: DXGI_FORMAT) -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_BitsPerColor(fmt: DXGI_FORMAT) -> usize;
 
-    pub(crate) fn DirectXTexFFI_FormatDataType(fmt: DXGI_FORMAT) -> FORMAT_TYPE;
+    pub(crate) unsafe fn DirectXTexFFI_FormatDataType(fmt: DXGI_FORMAT) -> FORMAT_TYPE;
 
-    pub(crate) fn DirectXTexFFI_ComputePitch(
+    pub(crate) unsafe fn DirectXTexFFI_ComputePitch(
         fmt: DXGI_FORMAT,
         width: usize,
         height: usize,
@@ -119,35 +119,35 @@ extern "C" {
         flags: CP_FLAGS,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ComputeScanlines(fmt: DXGI_FORMAT, height: usize) -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_ComputeScanlines(fmt: DXGI_FORMAT, height: usize) -> usize;
 
-    pub(crate) fn DirectXTexFFI_MakeSRGB(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
-    pub(crate) fn DirectXTexFFI_MakeLinear(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
-    pub(crate) fn DirectXTexFFI_MakeTypeless(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
-    pub(crate) fn DirectXTexFFI_MakeTypelessUNORM(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
-    pub(crate) fn DirectXTexFFI_MakeTypelessFLOAT(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) unsafe fn DirectXTexFFI_MakeSRGB(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) unsafe fn DirectXTexFFI_MakeLinear(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) unsafe fn DirectXTexFFI_MakeTypeless(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) unsafe fn DirectXTexFFI_MakeTypelessUNORM(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
+    pub(crate) unsafe fn DirectXTexFFI_MakeTypelessFLOAT(fmt: DXGI_FORMAT) -> DXGI_FORMAT;
 
     //---------------------------------------------------------------------------------
     // Texture metadata
 
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_TexMetadata_Sizeof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_TexMetadata_Sizeof() -> usize;
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_TexMetadata_Alignof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_TexMetadata_Alignof() -> usize;
 
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_DDSMetaData_Sizeof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_DDSMetaData_Sizeof() -> usize;
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_DDSMetaData_Alignof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_DDSMetaData_Alignof() -> usize;
 
-    pub(crate) fn DirectXTexFFI_TexMetadata_ComputIndex(
+    pub(crate) unsafe fn DirectXTexFFI_TexMetadata_ComputIndex(
         this: ConstNonNull<TexMetadata>,
         mip: usize,
         item: usize,
         slice: usize,
     ) -> usize;
 
-    pub(crate) fn DirectXTexFFI_GetMetadataFromDDSMemoryEx(
+    pub(crate) unsafe fn DirectXTexFFI_GetMetadataFromDDSMemoryEx(
         pSource: *const u8,
         size: usize,
         flags: DDS_FLAGS,
@@ -155,13 +155,13 @@ extern "C" {
         ddPixelFormat: *mut DDSMetaData,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_GetMetadataFromHDRMemory(
+    pub(crate) unsafe fn DirectXTexFFI_GetMetadataFromHDRMemory(
         pSource: *const u8,
         size: usize,
         metadata: MutNonNull<TexMetadata>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_GetMetadataFromTGAMemory(
+    pub(crate) unsafe fn DirectXTexFFI_GetMetadataFromTGAMemory(
         pSource: *const u8,
         size: usize,
         flags: TGA_FLAGS,
@@ -172,22 +172,22 @@ extern "C" {
     // Bitmap image container
 
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_Image_Sizeof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_Image_Sizeof() -> usize;
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_Image_Alignof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_Image_Alignof() -> usize;
 
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_ScratchImage_Sizeof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Sizeof() -> usize;
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_ScratchImage_Alignof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Alignof() -> usize;
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Initialize(
         this: MutNonNull<ScratchImage>,
         mdata: ConstNonNull<TexMetadata>,
         flags: CP_FLAGS,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize1D(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Initialize1D(
         this: MutNonNull<ScratchImage>,
         fmt: DXGI_FORMAT,
         length: usize,
@@ -195,7 +195,7 @@ extern "C" {
         mipLevels: usize,
         flags: CP_FLAGS,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize2D(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Initialize2D(
         this: MutNonNull<ScratchImage>,
         fmt: DXGI_FORMAT,
         width: usize,
@@ -204,7 +204,7 @@ extern "C" {
         mipLevels: usize,
         flags: CP_FLAGS,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize3D(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Initialize3D(
         this: MutNonNull<ScratchImage>,
         fmt: DXGI_FORMAT,
         width: usize,
@@ -213,7 +213,7 @@ extern "C" {
         mipLevels: usize,
         flags: CP_FLAGS,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeCube(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_InitializeCube(
         this: MutNonNull<ScratchImage>,
         fmt: DXGI_FORMAT,
         width: usize,
@@ -223,47 +223,47 @@ extern "C" {
         flags: CP_FLAGS,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeFromImage(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_InitializeFromImage(
         this: MutNonNull<ScratchImage>,
         srcImage: ConstNonNull<Image>,
         allow1D: bool,
         flags: CP_FLAGS,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeArrayFromImages(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_InitializeArrayFromImages(
         this: MutNonNull<ScratchImage>,
         images: *const Image,
         nImages: usize,
         allow1D: bool,
         flags: CP_FLAGS,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ScratchImage_InitializeCubeFromImages(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_InitializeCubeFromImages(
         this: MutNonNull<ScratchImage>,
         images: *const Image,
         nImages: usize,
         flags: CP_FLAGS,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ScratchImage_Initialize3DFromImages(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Initialize3DFromImages(
         this: MutNonNull<ScratchImage>,
         images: *const Image,
         depth: usize,
         flags: CP_FLAGS,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_Release(this: MutNonNull<ScratchImage>);
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_Release(this: MutNonNull<ScratchImage>);
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_OverrideFormat(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_OverrideFormat(
         this: MutNonNull<ScratchImage>,
         f: DXGI_FORMAT,
     ) -> bool;
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_GetImage(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_GetImage(
         this: ConstNonNull<ScratchImage>,
         mip: usize,
         item: usize,
         slice: usize,
     ) -> *const Image;
 
-    pub(crate) fn DirectXTexFFI_ScratchImage_IsAlphaAllOpaque(
+    pub(crate) unsafe fn DirectXTexFFI_ScratchImage_IsAlphaAllOpaque(
         this: ConstNonNull<ScratchImage>,
     ) -> bool;
 
@@ -271,20 +271,23 @@ extern "C" {
     // Memory blob (allocated buffer pointer is always 16-byte aligned)
 
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_Blob_Sizeof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_Blob_Sizeof() -> usize;
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_Blob_Alignof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_Blob_Alignof() -> usize;
 
-    pub(crate) fn DirectXTexFFI_Blob_Initialize(this: MutNonNull<Blob>, size: usize) -> HResult;
-    pub(crate) fn DirectXTexFFI_Blob_Release(this: MutNonNull<Blob>);
-    pub(crate) fn DirectXTexFFI_Blob_Resize(this: MutNonNull<Blob>, size: usize) -> HResult;
-    pub(crate) fn DirectXTexFFI_Blob_Trim(this: MutNonNull<Blob>, size: usize) -> HResult;
+    pub(crate) unsafe fn DirectXTexFFI_Blob_Initialize(
+        this: MutNonNull<Blob>,
+        size: usize,
+    ) -> HResult;
+    pub(crate) unsafe fn DirectXTexFFI_Blob_Release(this: MutNonNull<Blob>);
+    pub(crate) unsafe fn DirectXTexFFI_Blob_Resize(this: MutNonNull<Blob>, size: usize) -> HResult;
+    pub(crate) unsafe fn DirectXTexFFI_Blob_Trim(this: MutNonNull<Blob>, size: usize) -> HResult;
 
     //---------------------------------------------------------------------------------
     // Image I/O
 
     // DDS operations
-    pub(crate) fn DirectXTexFFI_LoadFromDDSMemoryEx(
+    pub(crate) unsafe fn DirectXTexFFI_LoadFromDDSMemoryEx(
         pSource: *const u8,
         size: usize,
         flags: DDS_FLAGS,
@@ -293,12 +296,12 @@ extern "C" {
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_SaveToDDSMemory1(
+    pub(crate) unsafe fn DirectXTexFFI_SaveToDDSMemory1(
         image: ConstNonNull<Image>,
         flags: DDS_FLAGS,
         blob: MutNonNull<Blob>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_SaveToDDSMemory2(
+    pub(crate) unsafe fn DirectXTexFFI_SaveToDDSMemory2(
         images: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -307,20 +310,20 @@ extern "C" {
     ) -> HResult;
 
     // HDR operations
-    pub(crate) fn DirectXTexFFI_LoadFromHDRMemory(
+    pub(crate) unsafe fn DirectXTexFFI_LoadFromHDRMemory(
         pSource: *const u8,
         size: usize,
         metadata: *mut TexMetadata,
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_SaveToHDRMemory(
+    pub(crate) unsafe fn DirectXTexFFI_SaveToHDRMemory(
         image: ConstNonNull<Image>,
         blob: MutNonNull<Blob>,
     ) -> HResult;
 
     // TGA operations
-    pub(crate) fn DirectXTexFFI_LoadFromTGAMemory(
+    pub(crate) unsafe fn DirectXTexFFI_LoadFromTGAMemory(
         pSource: *const u8,
         size: usize,
         flags: TGA_FLAGS,
@@ -328,7 +331,7 @@ extern "C" {
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_SaveToTGAMemory(
+    pub(crate) unsafe fn DirectXTexFFI_SaveToTGAMemory(
         image: ConstNonNull<Image>,
         flags: TGA_FLAGS,
         blob: MutNonNull<Blob>,
@@ -338,14 +341,14 @@ extern "C" {
     //---------------------------------------------------------------------------------
     // Texture conversion, resizing, mipmap generation, and block compression
 
-    pub(crate) fn DirectXTexFFI_Resize1(
+    pub(crate) unsafe fn DirectXTexFFI_Resize1(
         srcImage: ConstNonNull<Image>,
         width: usize,
         height: usize,
         filter: TEX_FILTER_FLAGS,
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_Resize2(
+    pub(crate) unsafe fn DirectXTexFFI_Resize2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -355,14 +358,14 @@ extern "C" {
         result: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_Convert1(
+    pub(crate) unsafe fn DirectXTexFFI_Convert1(
         srcImage: ConstNonNull<Image>,
         format: DXGI_FORMAT,
         filter: TEX_FILTER_FLAGS,
         threshold: f32,
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_Convert2(
+    pub(crate) unsafe fn DirectXTexFFI_Convert2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -372,25 +375,25 @@ extern "C" {
         result: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ConvertToSinglePlane1(
+    pub(crate) unsafe fn DirectXTexFFI_ConvertToSinglePlane1(
         srcImage: ConstNonNull<Image>,
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ConvertToSinglePlane2(
+    pub(crate) unsafe fn DirectXTexFFI_ConvertToSinglePlane2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_GenerateMipMaps1(
+    pub(crate) unsafe fn DirectXTexFFI_GenerateMipMaps1(
         baseImage: ConstNonNull<Image>,
         filter: TEX_FILTER_FLAGS,
         levels: usize,
         mipChain: MutNonNull<ScratchImage>,
         allow1D: bool,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_GenerateMipMaps2(
+    pub(crate) unsafe fn DirectXTexFFI_GenerateMipMaps2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -399,14 +402,14 @@ extern "C" {
         mipChain: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_GenerateMipMaps3D1(
+    pub(crate) unsafe fn DirectXTexFFI_GenerateMipMaps3D1(
         baseImages: *const Image,
         depth: usize,
         filter: TEX_FILTER_FLAGS,
         levels: usize,
         mipChain: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_GenerateMipMaps3D2(
+    pub(crate) unsafe fn DirectXTexFFI_GenerateMipMaps3D2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -415,7 +418,7 @@ extern "C" {
         mipChain: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ScaleMipMapsAlphaForCoverage(
+    pub(crate) unsafe fn DirectXTexFFI_ScaleMipMapsAlphaForCoverage(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -424,12 +427,12 @@ extern "C" {
         mipChain: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_PremultiplyAlpha1(
+    pub(crate) unsafe fn DirectXTexFFI_PremultiplyAlpha1(
         srcImage: ConstNonNull<Image>,
         flags: TEX_PMALPHA_FLAGS,
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_PremultiplyAlpha2(
+    pub(crate) unsafe fn DirectXTexFFI_PremultiplyAlpha2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -437,14 +440,14 @@ extern "C" {
         result: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_Compress1(
+    pub(crate) unsafe fn DirectXTexFFI_Compress1(
         srcImage: ConstNonNull<Image>,
         format: DXGI_FORMAT,
         compress: TEX_COMPRESS_FLAGS,
         threshold: f32,
         cImage: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_Compress2(
+    pub(crate) unsafe fn DirectXTexFFI_Compress2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -454,12 +457,12 @@ extern "C" {
         cImages: MutNonNull<ScratchImage>,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_Decompress1(
+    pub(crate) unsafe fn DirectXTexFFI_Decompress1(
         cImage: ConstNonNull<Image>,
         format: DXGI_FORMAT,
         image: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_Decompress2(
+    pub(crate) unsafe fn DirectXTexFFI_Decompress2(
         cImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -470,14 +473,14 @@ extern "C" {
     //---------------------------------------------------------------------------------
     // Normal map operations
 
-    pub(crate) fn DirectXTexFFI_ComputeNormalMap1(
+    pub(crate) unsafe fn DirectXTexFFI_ComputeNormalMap1(
         srcImage: ConstNonNull<Image>,
         flags: CNMAP_FLAGS,
         amplitude: f32,
         format: DXGI_FORMAT,
         normalMap: MutNonNull<ScratchImage>,
     ) -> HResult;
-    pub(crate) fn DirectXTexFFI_ComputeNormalMap2(
+    pub(crate) unsafe fn DirectXTexFFI_ComputeNormalMap2(
         srcImages: *const Image,
         nimages: usize,
         metadata: ConstNonNull<TexMetadata>,
@@ -491,11 +494,11 @@ extern "C" {
     // Misc image operations
 
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_Rect_Sizeof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_Rect_Sizeof() -> usize;
     #[cfg(test)]
-    pub(crate) fn DirectXTexFFI_Rect_Alignof() -> usize;
+    pub(crate) unsafe fn DirectXTexFFI_Rect_Alignof() -> usize;
 
-    pub(crate) fn DirectXTexFFI_CopyRectangle(
+    pub(crate) unsafe fn DirectXTexFFI_CopyRectangle(
         srcImage: ConstNonNull<Image>,
         srcRect: ConstNonNull<Rect>,
         dstImage: MutNonNull<Image>,
@@ -504,7 +507,7 @@ extern "C" {
         yOffset: usize,
     ) -> HResult;
 
-    pub(crate) fn DirectXTexFFI_ComputeMSE(
+    pub(crate) unsafe fn DirectXTexFFI_ComputeMSE(
         image1: ConstNonNull<Image>,
         image2: ConstNonNull<Image>,
         mse: MutNonNull<f32>,
@@ -515,7 +518,7 @@ extern "C" {
     //---------------------------------------------------------------------------------
     // DDS helper functions
 
-    pub(crate) fn DirectXTexFFI_EncodeDDSHeader(
+    pub(crate) unsafe fn DirectXTexFFI_EncodeDDSHeader(
         metadata: ConstNonNull<TexMetadata>,
         flags: DDS_FLAGS,
         pDestination: *mut u8,
