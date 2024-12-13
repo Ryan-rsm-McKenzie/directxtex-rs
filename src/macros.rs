@@ -22,12 +22,6 @@ macro_rules! c_enum {
 			pub const fn bits(self) -> $underlying {
 				self.0
 			}
-
-			#[allow(unused)]
-			#[must_use]
-			pub(crate) const fn bits_fixed(self) -> u32 {
-				self.bits() as u32
-			}
 		}
 
 		impl Default for $enumeration {
