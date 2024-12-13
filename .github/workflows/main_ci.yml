@@ -2,9 +2,9 @@ name: Main CI
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
   pull_request:
-    branches: ['main']
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -18,9 +18,15 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Nightly
+        run: |
+          rustup toolchain install nightly --component clippy
+          rustup override set nightly
+      - name: Clippy
+        run: cargo clippy -- -Dwarnings
       - name: Build
         run: cargo build
       - name: Run tests
