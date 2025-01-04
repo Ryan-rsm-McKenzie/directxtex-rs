@@ -90,18 +90,6 @@ impl HResult {
     }
 }
 
-impl Debug for HResult {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "HResult({self})")
-    }
-}
-
-impl Display for HResult {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "0x{:08X} {:?}", self.0, winresult::HResult::from(self.0))
-    }
-}
-
 impl From<u32> for HResult {
     fn from(value: u32) -> Self {
         Self(value)
@@ -117,27 +105,6 @@ impl From<HResult> for u32 {
 #[cfg(test)]
 mod tests {
     use crate::hresult::HResult;
-
-    #[test]
-    fn success() {
-        macro_rules! test {
-            ($error_code:literal, $message:literal) => {{
-                let result = HResult::from($error_code);
-                assert!(result.is_success());
-                assert!(result.success(0).is_ok());
-                let display = format!("{result}");
-                assert!(display.ends_with($message));
-                let debug = format!("{result:?}");
-                assert!(debug.ends_with(core::concat!($message, ")")));
-            }};
-        }
-
-        test!(0x00000000, "OK");
-        test!(0x00000001, "FALSE");
-        test!(0x000401A0, "S_TRUNCATED");
-        test!(0x00041300, "S_TASK_READY");
-        test!(0x003D0001, "S_END");
-    }
 
     #[test]
     fn error() {
