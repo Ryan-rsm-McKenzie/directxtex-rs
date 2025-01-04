@@ -1,7 +1,6 @@
-use core::fmt::{self, Display, Formatter};
+use core::fmt::{self, Debug, Display, Formatter};
 use std::error;
 
-#[derive(Debug)]
 #[repr(transparent)]
 pub struct HResultError(HResult);
 
@@ -32,15 +31,26 @@ impl HResultError {
     }
 }
 
+impl Debug for HResultError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "HResultError({self})")
+    }
+}
+
 impl Display for HResultError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "HRESULT 0x{:08X}", self.0 .0)
+        write!(
+            f,
+            "0x{:08X} {:?}",
+            self.0 .0,
+            winresult::HResultError::from_constant(self.0 .0)
+        )
     }
 }
 
 impl error::Error for HResultError {}
 
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Default, Eq, PartialEq)]
 #[must_use]
 #[repr(transparent)]
 pub(crate) struct HResult(u32);
@@ -80,6 +90,18 @@ impl HResult {
     }
 }
 
+impl Debug for HResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "HResult({self})")
+    }
+}
+
+impl Display for HResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "0x{:08X} {:?}", self.0, winresult::HResult::from(self.0))
+    }
+}
+
 impl From<u32> for HResult {
     fn from(value: u32) -> Self {
         Self(value)
@@ -89,5 +111,56 @@ impl From<u32> for HResult {
 impl From<HResult> for u32 {
     fn from(value: HResult) -> Self {
         value.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::hresult::HResult;
+
+    #[test]
+    fn success() {
+        macro_rules! test {
+            ($error_code:literal, $message:literal) => {{
+                let result = HResult::from($error_code);
+                assert!(result.is_success());
+                assert!(result.success(0).is_ok());
+                let display = format!("{result}");
+                assert!(display.ends_with($message));
+                let debug = format!("{result:?}");
+                assert!(debug.ends_with(core::concat!($message, ")")));
+            }};
+        }
+
+        test!(0x00000000, "OK");
+        test!(0x00000001, "FALSE");
+        test!(0x000401A0, "S_TRUNCATED");
+        test!(0x00041300, "S_TASK_READY");
+        test!(0x003D0001, "S_END");
+    }
+
+    #[test]
+    fn error() {
+        macro_rules! test {
+            ($error_code:literal, $message:literal) => {{
+                let error = {
+                    let result = HResult::from($error_code);
+                    assert!(!result.is_success());
+                    let success = result.success(0);
+                    assert!(success.is_err());
+                    success.unwrap_err()
+                };
+                let display = format!("{error}");
+                assert!(display.ends_with($message));
+                let debug = format!("{error:?}");
+                assert!(debug.ends_with(core::concat!($message, ")")));
+            }};
+        }
+
+        test!(0x80080200, "E_PACKAGING_INTERNAL");
+        test!(0x800B0101, "E_EXPIRED");
+        test!(0x80094001, "E_BAD_REQUESTSUBJECT");
+        test!(0x80004006, "E_INIT_TLS");
+        test!(0x80110401, "E_OBJECTERRORS");
     }
 }

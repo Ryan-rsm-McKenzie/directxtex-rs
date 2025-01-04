@@ -41,7 +41,7 @@ impl TexMetadata {
     /// Helpers for [`misc_flags2`](Self::misc_flags2)
     pub fn is_pm_alpha(&self) -> bool {
         (self.misc_flags2 & TEX_MISC_FLAG2::TEX_MISC2_ALPHA_MODE_MASK.bits())
-            == TEX_ALPHA_MODE::TEX_ALPHA_MODE_PREMULTIPLIED.into()
+            == TEX_ALPHA_MODE::TEX_ALPHA_MODE_PREMULTIPLIED.bits()
     }
 
     /// Helpers for [`misc_flags2`](Self::misc_flags2)
