@@ -134,11 +134,14 @@ pub use self::{
         TEX_FILTER_SRGB_MASK, TEX_THRESHOLD_DEFAULT,
     },
     dds_metadata::DDSMetaData,
-    dxgi_format::{Pitch, DXGI_FORMAT},
+    dxgi_format::{dxgi_format::*, Pitch, DXGI_FORMAT},
     enums::{
-        CMSE_FLAGS, CNMAP_FLAGS, CP_FLAGS, DDS_FLAGS, FORMAT_TYPE, TEX_ALPHA_MODE,
-        TEX_COMPRESS_FLAGS, TEX_DIMENSION, TEX_FILTER_FLAGS, TEX_MISC_FLAG, TEX_MISC_FLAG2,
-        TEX_PMALPHA_FLAGS, TGA_FLAGS,
+        cmse_flags::*, cnmap_flags::*, cp_flags::*, dds_flags::*, format_type::*,
+        tex_alpha_mode::*, tex_compress_flags::*, tex_dimension::*, tex_filter_flags::*,
+        tex_misc_flag::*, tex_misc_flag2::*, tex_pmalpha_flags::*, tga_flags::*, CMSE_FLAGS,
+        CNMAP_FLAGS, CP_FLAGS, DDS_FLAGS, FORMAT_TYPE, TEX_ALPHA_MODE, TEX_COMPRESS_FLAGS,
+        TEX_DIMENSION, TEX_FILTER_FLAGS, TEX_MISC_FLAG, TEX_MISC_FLAG2, TEX_PMALPHA_FLAGS,
+        TGA_FLAGS,
     },
     free_functions::{
         compress, compute_normal_map, convert, convert_to_single_plane, decompress,

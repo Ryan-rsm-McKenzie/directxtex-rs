@@ -1,10 +1,15 @@
 macro_rules! c_enum {
 	(
 		$(#[doc=$enumeration_doc:literal])*
-		$enumeration:ident($underlying:ty) => {$(
+		$module:ident::$enumeration:ident($underlying:ty) => {$(
 			$(#[doc=$variant_doc:literal])*
 			$variant:ident = $value:literal,
 		)*}
+
+		$(extra => {$(
+			$(#[doc=$extra_variant_doc:literal])*
+			$extra_variant:ident = $extra_value:literal,
+		)*})?
 	) => {
 		#[allow(non_camel_case_types)]
 		#[derive(Clone, Copy, Eq, Hash, PartialEq, PartialOrd, Ord)]
@@ -17,6 +22,11 @@ macro_rules! c_enum {
 				$(#[doc = $variant_doc])*
 				pub const $variant: Self = Self($value);
 			)*
+
+			$($(
+				$(#[doc = $extra_variant_doc])*
+				pub const $extra_variant: Self = Self($extra_value);
+			)*)?
 
 			#[must_use]
 			pub const fn bits(self) -> $underlying {
@@ -46,9 +56,27 @@ macro_rules! c_enum {
 			fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 				match self.0 {
 					$($value => write!(f, "{}", core::stringify!($variant)),)*
+					$($(
+						#[allow(unreachable_patterns)]
+						$extra_value => write!(f, "{}", core::stringify!($extra_variant)),
+					)*)?
 					unk => write!(f, "0x{unk:x}"),
 				}
 			}
+		}
+
+		pub(crate) mod $module {
+			use super::$enumeration;
+
+			$(
+				$(#[doc = $variant_doc])*
+				pub const $variant: $enumeration = $enumeration($value);
+			)*
+
+			$($(
+				$(#[doc = $extra_variant_doc])*
+				pub const $extra_variant: $enumeration = $enumeration($extra_value);
+			)*)?
 		}
 	};
 }
@@ -58,10 +86,15 @@ pub(crate) use c_enum;
 macro_rules! c_bits {
 	(
 		$(#[doc=$enumeration_doc:literal])*
-		$enumeration:ident($underlying:ty) => {$(
+		$module:ident::$enumeration:ident($underlying:ty) => {$(
 			$(#[doc=$variant_doc:literal])*
 			$variant:ident = $value:literal,
 		)*}
+
+		$(extra => {$(
+			$(#[doc=$extra_variant_doc:literal])*
+			$extra_variant:ident = $extra_value:expr;
+		)*})?
 	) => {
 		bitflags::bitflags! {
 			#[allow(non_camel_case_types)]
@@ -78,11 +111,30 @@ macro_rules! c_bits {
 		}
 
 		impl $enumeration {
+			$($(
+				$(#[doc = $extra_variant_doc])*
+				pub const $extra_variant: Self = $extra_value;
+			)*)?
+
 			#[allow(unused)]
 			#[must_use]
 			pub(crate) fn bits_fixed(self) -> u32 {
 				self.bits() as u32
 			}
+		}
+
+		pub(crate) mod $module {
+			use super::$enumeration;
+
+			$(
+				$(#[doc = $variant_doc])*
+				pub const $variant: $enumeration = unsafe { $enumeration::from_bits($value).unwrap_unchecked() };
+			)*
+
+			$($(
+				$(#[doc = $extra_variant_doc])*
+				pub const $extra_variant: $enumeration = $extra_value;
+			)*)?
 		}
 	};
 }

@@ -1,7 +1,7 @@
 use crate::macros;
 
 macros::c_enum! {
-    FORMAT_TYPE(u32) => {
+    format_type::FORMAT_TYPE(u32) => {
         FORMAT_TYPE_TYPELESS = 0,
         FORMAT_TYPE_FLOAT = 1,
         FORMAT_TYPE_UNORM = 2,
@@ -12,7 +12,7 @@ macros::c_enum! {
 }
 
 macros::c_bits! {
-    CP_FLAGS(u32) => {
+    cp_flags::CP_FLAGS(u32) => {
         /// Assume pitch is DWORD aligned instead of BYTE aligned
         CP_FLAGS_LEGACY_DWORD = 0x1,
 
@@ -40,16 +40,16 @@ macros::c_bits! {
         /// Override with a legacy 8 bits-per-pixel format size
         CP_FLAGS_8BPP = 0x40000,
     }
-}
 
-impl CP_FLAGS {
-    /// Normal operation
-    pub const CP_FLAGS_NONE: Self = Self::empty();
+    extra => {
+        /// Normal operation
+        CP_FLAGS_NONE = CP_FLAGS::empty();
+    }
 }
 
 macros::c_enum! {
     /// Subset here matches D3D10_RESOURCE_DIMENSION and D3D11_RESOURCE_DIMENSION
-    TEX_DIMENSION(u32) => {
+    tex_dimension::TEX_DIMENSION(u32) => {
         TEX_DIMENSION_TEXTURE1D = 2,
         TEX_DIMENSION_TEXTURE2D = 3,
         TEX_DIMENSION_TEXTURE3D = 4,
@@ -58,20 +58,20 @@ macros::c_enum! {
 
 macros::c_enum! {
     /// Subset here matches D3D10_RESOURCE_MISC_FLAG and D3D11_RESOURCE_MISC_FLAG
-    TEX_MISC_FLAG(u32) => {
+    tex_misc_flag::TEX_MISC_FLAG(u32) => {
         TEX_MISC_TEXTURECUBE = 0x4,
     }
 }
 
 macros::c_enum! {
-    TEX_MISC_FLAG2(u32) => {
+    tex_misc_flag2::TEX_MISC_FLAG2(u32) => {
         TEX_MISC2_ALPHA_MODE_MASK = 0x7,
     }
 }
 
 macros::c_enum! {
     /// Matches DDS_ALPHA_MODE, encoded in MISC_FLAGS2
-    TEX_ALPHA_MODE(u32) => {
+    tex_alpha_mode::TEX_ALPHA_MODE(u32) => {
         TEX_ALPHA_MODE_UNKNOWN = 0,
         TEX_ALPHA_MODE_STRAIGHT = 1,
         TEX_ALPHA_MODE_PREMULTIPLIED = 2,
@@ -81,7 +81,7 @@ macros::c_enum! {
 }
 
 macros::c_bits! {
-    DDS_FLAGS(u32) => {
+    dds_flags::DDS_FLAGS(u32) => {
         /// Assume pitch is DWORD aligned instead of BYTE aligned (used by some legacy DDS files)
         DDS_FLAGS_LEGACY_DWORD = 0x1,
 
@@ -121,14 +121,14 @@ macros::c_bits! {
         /// Enables the loader to read large dimension .dds files (i.e. greater than known hardware requirements)
         DDS_FLAGS_ALLOW_LARGE_FILES = 0x1000000,
     }
-}
 
-impl DDS_FLAGS {
-    pub const DDS_FLAGS_NONE: Self = Self::empty();
+    extra => {
+        DDS_FLAGS_NONE = DDS_FLAGS::empty();
+    }
 }
 
 macros::c_bits! {
-    TGA_FLAGS(u32) => {
+    tga_flags::TGA_FLAGS(u32) => {
         /// 24bpp files are returned as BGRX; 32bpp files are returned as BGRA
         TGA_FLAGS_BGR = 0x1,
 
@@ -147,14 +147,14 @@ macros::c_bits! {
         /// If no colorspace is specified in TGA 2.0 metadata, assume sRGB
         TGA_FLAGS_DEFAULT_SRGB = 0x80,
     }
-}
 
-impl TGA_FLAGS {
-    pub const TGA_FLAGS_NONE: Self = Self::empty();
+    extra => {
+        TGA_FLAGS_NONE = TGA_FLAGS::empty();
+    }
 }
 
 macros::c_bits! {
-    TEX_FILTER_FLAGS(u32) => {
+    tex_filter_flags::TEX_FILTER_FLAGS(u32) => {
         /// Wrap vs. Mirror vs. Clamp filtering options
         TEX_FILTER_WRAP_U = 0x1,
         /// Wrap vs. Mirror vs. Clamp filtering options
@@ -226,31 +226,30 @@ macros::c_bits! {
         /// Forces use of the WIC path even when logic would have picked a non-WIC path when both are an option
         TEX_FILTER_FORCE_WIC = 0x20000000,
     }
-}
 
-impl TEX_FILTER_FLAGS {
-    pub const TEX_FILTER_DEFAULT: Self = Self::empty();
-}
+    extra => {
+        TEX_FILTER_DEFAULT = TEX_FILTER_FLAGS::empty();
 
-impl TEX_FILTER_FLAGS {
-    /// Wrap vs. Mirror vs. Clamp filtering options
-    pub const TEX_FILTER_WRAP: Self = Self::TEX_FILTER_WRAP_U
-        .union(Self::TEX_FILTER_WRAP_V)
-        .union(Self::TEX_FILTER_WRAP_W);
+        /// Wrap vs. Mirror vs. Clamp filtering options
+        TEX_FILTER_WRAP = TEX_FILTER_FLAGS::TEX_FILTER_WRAP_U
+            .union(TEX_FILTER_FLAGS::TEX_FILTER_WRAP_V)
+            .union(TEX_FILTER_FLAGS::TEX_FILTER_WRAP_W);
 
-    /// Wrap vs. Mirror vs. Clamp filtering options
-    pub const TEX_FILTER_MIRROR: Self = Self::TEX_FILTER_MIRROR_U
-        .union(Self::TEX_FILTER_MIRROR_V)
-        .union(Self::TEX_FILTER_MIRROR_W);
+        /// Wrap vs. Mirror vs. Clamp filtering options
+        TEX_FILTER_MIRROR = TEX_FILTER_FLAGS::TEX_FILTER_MIRROR_U
+            .union(TEX_FILTER_FLAGS::TEX_FILTER_MIRROR_V)
+            .union(TEX_FILTER_FLAGS::TEX_FILTER_MIRROR_W);
 
-    /// sRGB <-> RGB for use in conversion operations
-    ///
-    /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
-    pub const TEX_FILTER_SRGB: Self = Self::TEX_FILTER_SRGB_IN.union(Self::TEX_FILTER_SRGB_OUT);
+        /// sRGB <-> RGB for use in conversion operations
+        ///
+        /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
+        TEX_FILTER_SRGB = TEX_FILTER_FLAGS::TEX_FILTER_SRGB_IN
+            .union(TEX_FILTER_FLAGS::TEX_FILTER_SRGB_OUT);
+    }
 }
 
 macros::c_bits! {
-    TEX_PMALPHA_FLAGS(u32) => {
+    tex_pmalpha_flags::TEX_PMALPHA_FLAGS(u32) => {
         /// ignores sRGB colorspace conversions
         TEX_PMALPHA_IGNORE_SRGB = 0x1,
 
@@ -262,19 +261,20 @@ macros::c_bits! {
         /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
         TEX_PMALPHA_SRGB_OUT = 0x2000000,
     }
-}
 
-impl TEX_PMALPHA_FLAGS {
-    pub const TEX_PMALPHA_DEFAULT: Self = Self::empty();
+    extra => {
+        TEX_PMALPHA_DEFAULT = TEX_PMALPHA_FLAGS::empty();
 
-    /// if the input format type is IsSRGB(), then SRGB_IN is on by default
-    ///
-    /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
-    pub const TEX_PMALPHA_SRGB: Self = Self::TEX_PMALPHA_SRGB_IN.union(Self::TEX_PMALPHA_SRGB_OUT);
+        /// if the input format type is IsSRGB(), then SRGB_IN is on by default
+        ///
+        /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
+        TEX_PMALPHA_SRGB = TEX_PMALPHA_FLAGS::TEX_PMALPHA_SRGB_IN
+            .union(TEX_PMALPHA_FLAGS::TEX_PMALPHA_SRGB_OUT);
+    }
 }
 
 macros::c_bits! {
-    TEX_COMPRESS_FLAGS(u32) => {
+    tex_compress_flags::TEX_COMPRESS_FLAGS(u32) => {
         /// Enables dithering RGB colors for BC1-3 compression
         TEX_COMPRESS_RGB_DITHER = 0x10000,
 
@@ -301,20 +301,20 @@ macros::c_bits! {
         /// Compress is free to use multithreading to improve performance (by default it does not use multithreading)
         TEX_COMPRESS_PARALLEL = 0x10000000,
     }
-}
 
-impl TEX_COMPRESS_FLAGS {
-    pub const TEX_COMPRESS_DEFAULT: Self = Self::empty();
+    extra => {
+        TEX_COMPRESS_DEFAULT = TEX_COMPRESS_FLAGS::empty();
 
-    /// if the input format type is IsSRGB(), then SRGB_IN is on by default
-    ///
-    /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
-    pub const TEX_COMPRESS_SRGB: Self =
-        Self::TEX_COMPRESS_SRGB_IN.union(Self::TEX_COMPRESS_SRGB_OUT);
+        /// if the input format type is IsSRGB(), then SRGB_IN is on by default
+        ///
+        /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
+        TEX_COMPRESS_SRGB = TEX_COMPRESS_FLAGS::TEX_COMPRESS_SRGB_IN
+            .union(TEX_COMPRESS_FLAGS::TEX_COMPRESS_SRGB_OUT);
+    }
 }
 
 macros::c_bits! {
-    CNMAP_FLAGS(u32) => {
+    cnmap_flags::CNMAP_FLAGS(u32) => {
         /// Channel selection when evaluting color value for height
         CNMAP_CHANNEL_RED = 0x1,
         /// Channel selection when evaluting color value for height
@@ -341,14 +341,14 @@ macros::c_bits! {
         /// Computes a crude occlusion term stored in the alpha channel
         CNMAP_COMPUTE_OCCLUSION = 0x8000,
     }
-}
 
-impl CNMAP_FLAGS {
-    pub const CNMAP_DEFAULT: Self = Self::empty();
+    extra => {
+        CNMAP_DEFAULT = CNMAP_FLAGS::empty();
+    }
 }
 
 macros::c_bits! {
-    CMSE_FLAGS(u32) => {
+    cmse_flags::CMSE_FLAGS(u32) => {
         /// Indicates that image needs gamma correction before comparision
         CMSE_IMAGE1_SRGB = 0x1,
         /// Indicates that image needs gamma correction before comparision
@@ -368,8 +368,8 @@ macros::c_bits! {
         /// Indicates that image should be scaled and biased before comparison (i.e. UNORM -> SNORM)
         CMSE_IMAGE2_X2_BIAS = 0x200,
     }
-}
 
-impl CMSE_FLAGS {
-    pub const CMSE_DEFAULT: Self = Self::empty();
+    extra => {
+        CMSE_DEFAULT = CMSE_FLAGS::empty();
+    }
 }
