@@ -158,6 +158,12 @@ pub use self::{
     texture_metadata::TexMetadata,
 };
 
+#[cfg(feature = "d3d11")]
+pub use self::{
+    free_functions::compress_d3d11,
+    d3d11::D3D11Device,
+};
+
 use hresult::HResult;
 
 type Result<T> = core::result::Result<T, HResultError>;
