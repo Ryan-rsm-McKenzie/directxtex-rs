@@ -525,4 +525,16 @@ unsafe extern "C" {
         maxsize: usize,
         required: MutNonNull<usize>,
     ) -> HResult;
+
+    #[cfg(all(windows, feature = "d3d11"))]
+    pub(crate) unsafe fn DirectXTexFFI_CompressD3D11_2(
+        device: MutNonNull<core::ffi::c_void>,
+        srcImages: *const Image,
+        nimages: usize,
+        metadata: ConstNonNull<TexMetadata>,
+        format: DXGI_FORMAT,
+        compress: TEX_COMPRESS_FLAGS,
+        threshold: f32,
+        cimages: MutNonNull<ScratchImage>,
+    ) -> HResult;
 }

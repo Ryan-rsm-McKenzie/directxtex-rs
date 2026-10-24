@@ -127,6 +127,9 @@ mod rect;
 mod scratch_image;
 mod texture_metadata;
 
+#[cfg(feature = "d3d11")]
+mod d3d11;
+
 pub use self::{
     blob::Blob,
     constants::{
@@ -153,6 +156,12 @@ pub use self::{
     rect::Rect,
     scratch_image::ScratchImage,
     texture_metadata::TexMetadata,
+};
+
+#[cfg(feature = "d3d11")]
+pub use self::{
+    free_functions::compress_d3d11,
+    d3d11::D3D11Device,
 };
 
 use hresult::HResult;

@@ -5,8 +5,13 @@ use crate::{
 };
 use core::ptr;
 
+#[cfg(feature = "d3d11")]
+use crate::d3d11::D3D11Device;
+
+
 #[derive(Debug)]
 #[repr(C)]
+#[allow(clippy::struct_field_names)]
 pub struct ScratchImage {
     m_nimages: usize,
     m_size: usize,
@@ -345,6 +350,18 @@ impl ScratchImage {
         ff::compress(self.images(), self.metadata(), format, compress, threshold)
     }
 
+    #[cfg(feature = "d3d11")]
+    pub fn compress_d3d11(
+        &self,
+        device: &mut D3D11Device,
+        format: DXGI_FORMAT,
+        compress: TEX_COMPRESS_FLAGS,
+        threshold: f32,
+    ) -> Result<Self> {
+        ff::compress_d3d11(device, self.images(), self.metadata(), format, compress, threshold)
+    }
+
+
     pub fn decompress(&self, format: DXGI_FORMAT) -> Result<Self> {
         ff::decompress(self.images(), self.metadata(), format)
     }
@@ -361,9 +378,12 @@ impl ScratchImage {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ffi, ScratchImage, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION};
+use crate::{ffi, ScratchImage, DXGI_FORMAT, TEX_ALPHA_MODE, TEX_DIMENSION};
     use core::mem;
     use std::fs;
+
+    #[cfg(feature = "d3d11")]
+    use crate::d3d11::D3D11Device;
 
     #[test]
     fn verify_layout() {
@@ -452,6 +472,31 @@ mod tests {
         let copy = copy.buffer();
         assert_eq!(original.len(), copy.len());
         assert_eq!(original, copy);
+    }
+
+    #[test]
+    #[cfg(feature = "d3d11")]
+    fn compress_dds() {
+        let Ok(mut gpu) = D3D11Device::new() else {
+            eprintln!("Skipping compress_dds: no usable D3D11 device available");
+            return;
+        };
+        let original = fs::read("data/ferris_wheel.dds").unwrap();
+        let scratch = ScratchImage::load_dds(&original, Default::default(), None, None).unwrap();
+        let compressed_scratch_image = scratch
+            .compress_d3d11(
+                &mut gpu,
+                DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM,
+                crate::TEX_COMPRESS_FLAGS::default(),
+                crate::TEX_THRESHOLD_DEFAULT,
+            )
+            .unwrap();
+        let compressed = compressed_scratch_image.save_dds(Default::default()).unwrap();
+        assert!(!compressed.buffer().is_empty());
+        assert!(original.len() > compressed.buffer().len());
+
+        let load_test = ScratchImage::load_dds(compressed.buffer(), Default::default(), None, None).unwrap();
+        assert_eq!(load_test.m_metadata.format, DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM);
     }
 
     #[test]
