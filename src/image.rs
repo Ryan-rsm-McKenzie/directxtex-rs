@@ -267,4 +267,25 @@ mod tests {
         assert_eq!(original.len(), copy.len());
         assert_eq!(original, copy);
     }
+
+    #[cfg(feature = "openmp")]
+    #[test]
+    fn compress_tga_openmp() {
+        use crate::*;
+
+        let original = fs::read("data/ferris_wheel_small.tga").unwrap();
+        let scratch = ScratchImage::load_tga(&original, Default::default(), None).unwrap();
+
+        let images = scratch.images();
+        assert_eq!(images.len(), 1);
+
+        let image = &images[0];
+        let compressed = image
+            .compress(
+                DXGI_FORMAT::DXGI_FORMAT_BC7_UNORM,
+                TEX_COMPRESS_FLAGS::default() | TEX_COMPRESS_FLAGS::TEX_COMPRESS_PARALLEL,
+                TEX_THRESHOLD_DEFAULT
+            );
+        assert!(compressed.is_ok()); 
+    }
 }

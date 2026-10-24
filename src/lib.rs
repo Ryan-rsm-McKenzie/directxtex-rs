@@ -127,6 +127,9 @@ mod rect;
 mod scratch_image;
 mod texture_metadata;
 
+#[cfg(feature = "openmp")]
+extern crate openmp_sys;
+
 pub use self::{
     blob::Blob,
     constants::{

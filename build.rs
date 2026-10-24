@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 
 use cc::Build;
-use std::path::Path;
+use std::{env, path::Path};
 
 fn make_standard_build() -> Build {
     let mut build = Build::new();
@@ -17,7 +17,9 @@ fn make_standard_build() -> Build {
         ]);
 
     if !cfg!(windows) {
-        build.includes(["external/DirectX-Headers/include/wsl/stubs", "ffi/include"]);
+        build
+            .includes(["external/DirectX-Headers/include/wsl/stubs", "ffi/include"])
+            .define("PAL_STDCPP_COMPAT", None);
     }
 
     let tool = build.get_compiler();
@@ -85,11 +87,36 @@ fn build_tex() {
                 ]
                 .into_iter()
                 .map(|x| root.join(x)),
-            )
-            .object("Ole32.lib");
+            );
+        println!("cargo:rustc-link-lib=ole32");
+
+    }
+
+    if cfg!(feature = "openmp") {
+        if let Ok(flags) = env::var("DEP_OPENMP_FLAG"){
+            flags
+            .split(' ')
+            .for_each(|f| {
+                build.flag(f);
+            });
+        }
+      
+        if let Some(includes) = env::var_os("DEP_OPENMP_INCLUDE"){
+            for f in env::split_paths(&includes).filter(|include| !include.as_os_str().is_empty()) {
+                build.include(f);
+            }
+        }
     }
 
     build.compile("DirectXTex");
+
+    if cfg!(feature = "openmp") {
+        if let Some(link) = env::var_os("DEP_OPENMP_CARGO_LINK_INSTRUCTIONS") {
+            for i in env::split_paths(&link).filter(|link| !link.as_os_str().is_empty()) {
+                println!("cargo:{}", i.display());
+            }
+        }
+    }
 }
 
 fn build_ffi() {

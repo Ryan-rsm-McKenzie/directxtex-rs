@@ -5,6 +5,7 @@ use crate::{
 };
 use core::ptr;
 
+#[allow(clippy::struct_field_names)]
 #[derive(Debug)]
 #[repr(C)]
 pub struct ScratchImage {

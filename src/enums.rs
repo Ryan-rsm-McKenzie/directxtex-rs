@@ -273,6 +273,35 @@ macros::c_bits! {
     }
 }
 
+#[cfg(not(feature = "openmp"))]
+macros::c_bits! {
+    tex_compress_flags::TEX_COMPRESS_FLAGS(u32) => {
+        /// Enables dithering RGB colors for BC1-3 compression
+        TEX_COMPRESS_RGB_DITHER = 0x10000,
+
+        /// Enables dithering alpha for BC1-3 compression
+        TEX_COMPRESS_A_DITHER = 0x20000,
+
+        /// Enables both RGB and alpha dithering for BC1-3 compression
+        TEX_COMPRESS_DITHER = 0x30000,
+
+        /// Uniform color weighting for BC1-3 compression; by default uses perceptual weighting
+        TEX_COMPRESS_UNIFORM = 0x40000,
+
+        /// Enables exhaustive search for BC7 compress for mode 0 and 2; by default skips trying these modes
+        TEX_COMPRESS_BC7_USE_3SUBSETS = 0x80000,
+
+        /// Minimal modes (usually mode 6) for BC7 compression
+        TEX_COMPRESS_BC7_QUICK = 0x100000,
+
+        /// if the input format type is IsSRGB(), then SRGB_IN is on by default
+        TEX_COMPRESS_SRGB_IN = 0x1000000,
+        /// if the output format type is IsSRGB(), then SRGB_OUT is on by default
+        TEX_COMPRESS_SRGB_OUT = 0x2000000,
+    }
+}
+
+#[cfg(feature = "openmp")]
 macros::c_bits! {
     tex_compress_flags::TEX_COMPRESS_FLAGS(u32) => {
         /// Enables dithering RGB colors for BC1-3 compression

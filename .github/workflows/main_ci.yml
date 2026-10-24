@@ -21,6 +21,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Install OpenMP (macOS only)
+        if: runner.os == 'macOS'
+        run: brew install libomp
       - name: Nightly
         run: |
           rustup toolchain install nightly --component clippy
@@ -29,5 +32,9 @@ jobs:
         run: cargo clippy -- -Dwarnings
       - name: Build
         run: cargo build
+      - name: Build with features
+        run: cargo build --all-features
       - name: Run tests
         run: cargo test
+      - name: Run tests with features
+        run: cargo test --all-features
